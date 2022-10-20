@@ -21,18 +21,9 @@ export async function setupContracts() {
     throw new Error("fee manager admin address is required");
   }
 
-  console.log("deploying upgrade gate");
-  const upgradeGate = await deployAndVerify(
-    "src/FactoryUpgradeGate.sol:FactoryUpgradeGate",
-    [feeManagerAdminAddress]
-  );
-  const upgradeGateAddress = upgradeGate.deployed.deploy.deployedTo;
-  console.log("Deployed upgrade gate to", upgradeGateAddress);
-
   console.log("deploying Erc721Drop");
   const dropContract = await deployAndVerify("src/ERC721Drop.sol:ERC721Drop", [
     zoraERC721TransferHelperAddress,
-    upgradeGateAddress,
   ]);
   const dropContractAddress = dropContract.deployed.deploy.deployedTo;
   console.log("deployed drop contract to ", dropContractAddress);
