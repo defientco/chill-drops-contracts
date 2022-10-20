@@ -21,11 +21,9 @@ import {IERC2981Upgradeable, IERC165Upgradeable} from "@openzeppelin/contracts-u
 import {AccessControlUpgradeable} from "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import {ReentrancyGuardUpgradeable} from "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import {MerkleProofUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/cryptography/MerkleProofUpgradeable.sol";
-import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import {IMetadataRenderer} from "./interfaces/IMetadataRenderer.sol";
 import {IERC721Drop} from "./interfaces/IERC721Drop.sol";
 import {IOwnable} from "./interfaces/IOwnable.sol";
-import {IFactoryUpgradeGate} from "./interfaces/IFactoryUpgradeGate.sol";
 import {OwnableSkeleton} from "./utils/OwnableSkeleton.sol";
 import {FundsReceiver} from "./utils/FundsReceiver.sol";
 import {Version} from "./utils/Version.sol";
@@ -41,7 +39,6 @@ import {ERC721DropStorageV1} from "./storage/ERC721DropStorageV1.sol";
  */
 contract ERC721Drop is
     ERC721AUpgradeable,
-    UUPSUpgradeable,
     IERC2981Upgradeable,
     ReentrancyGuardUpgradeable,
     AccessControlUpgradeable,
@@ -63,9 +60,6 @@ contract ERC721Drop is
 
     /// @dev ZORA V3 transfer helper address for auto-approval
     address internal immutable zoraERC721TransferHelper;
-
-    /// @dev Factory upgrade gate
-    IFactoryUpgradeGate internal immutable factoryUpgradeGate;
 
     /// @notice Max royalty BPS
     uint16 constant MAX_ROYALTY_BPS = 50_00;
@@ -144,12 +138,8 @@ contract ERC721Drop is
     /// @notice Global constructor – these variables will not change with further proxy deploys
     /// @dev Marked as an initializer to prevent storage being used of base implementation. Can only be init'd by a proxy.
     /// @param _zoraERC721TransferHelper Transfer helper
-    constructor(
-        address _zoraERC721TransferHelper,
-        IFactoryUpgradeGate _factoryUpgradeGate
-    ) initializer {
+    constructor(address _zoraERC721TransferHelper) initializer {
         zoraERC721TransferHelper = _zoraERC721TransferHelper;
-        factoryUpgradeGate = _factoryUpgradeGate;
     }
 
     ///  @dev Create a new drop contract
@@ -203,24 +193,6 @@ contract ERC721Drop is
     /// @return boolean if address is admin
     function isAdmin(address user) external view returns (bool) {
         return hasRole(DEFAULT_ADMIN_ROLE, user);
-    }
-
-    /// @notice Connects this contract to the factory upgrade gate
-    /// @param newImplementation proposed new upgrade implementation
-    /// @dev Only can be called by admin
-    function _authorizeUpgrade(address newImplementation)
-        internal
-        override
-        onlyAdmin
-    {
-        if (
-            !factoryUpgradeGate.isValidUpgradePath({
-                _newImpl: newImplementation,
-                _currentImpl: _getImplementation()
-            })
-        ) {
-            revert Admin_InvalidUpgradeAddress(newImplementation);
-        }
     }
 
     //        ,-.
