@@ -73,7 +73,7 @@ contract ERC721DropTest is DSTest {
         vm.prank(DEFAULT_ZORA_DAO_ADDRESS);
         factoryUpgradeGate = new FactoryUpgradeGate(UPGRADE_GATE_ADMIN_ADDRESS);
         vm.prank(DEFAULT_ZORA_DAO_ADDRESS);
-        impl = address(new ERC721Drop(address(0x1234), factoryUpgradeGate));
+        impl = address(new ERC721Drop(address(0x1234)));
         address payable newDrop = payable(
             address(new ERC721DropProxy(impl, ""))
         );
@@ -151,22 +151,6 @@ contract ERC721DropTest is DSTest {
             "owner is wrong for new minted token"
         );
         assertEq(address(zoraNFTBase).balance, amount);
-    }
-
-    function test_UpgradeApproved() public setupZoraNFTBase(10) {
-        address newImpl = address(
-            new ERC721Drop(address(0x3333), factoryUpgradeGate)
-        );
-
-        address[] memory lastImpls = new address[](1);
-        lastImpls[0] = impl;
-        vm.prank(UPGRADE_GATE_ADMIN_ADDRESS);
-        factoryUpgradeGate.registerNewUpgradePath({
-            _newImpl: newImpl,
-            _supportedPrevImpls: lastImpls
-        });
-        vm.prank(DEFAULT_OWNER_ADDRESS);
-        zoraNFTBase.upgradeTo(newImpl);
     }
 
     function test_PurchaseTime() public setupZoraNFTBase(10) {

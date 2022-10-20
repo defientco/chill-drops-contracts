@@ -25,10 +25,7 @@ contract ZoraFeeManagerTest is DSTest {
 
     function setUp() public {
         vm.prank(DEFAULT_ZORA_DAO_ADDRESS);
-        dropImpl = new ERC721Drop(
-            address(1234),
-            FactoryUpgradeGate(address(0))
-        );
+        dropImpl = new ERC721Drop(address(1234));
         editionMetadataRenderer = new EditionMetadataRenderer();
         dropMetadataRenderer = new DropMetadataRenderer();
         ZoraNFTCreatorV1 impl = new ZoraNFTCreatorV1(
