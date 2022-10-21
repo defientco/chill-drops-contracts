@@ -20,17 +20,14 @@ contract ZoraNFTCreatorV1Test is DSTest {
         payable(address(0x999));
     ERC721Drop public dropImpl;
     ZoraNFTCreatorV1 public creator;
-    EditionMetadataRenderer public editionMetadataRenderer;
     DropMetadataRenderer public dropMetadataRenderer;
 
     function setUp() public {
         vm.prank(DEFAULT_ZORA_DAO_ADDRESS);
         dropImpl = new ERC721Drop(address(1234));
-        editionMetadataRenderer = new EditionMetadataRenderer();
         dropMetadataRenderer = new DropMetadataRenderer();
         ZoraNFTCreatorV1 impl = new ZoraNFTCreatorV1(
             address(dropImpl),
-            editionMetadataRenderer,
             dropMetadataRenderer
         );
         creator = ZoraNFTCreatorV1(
