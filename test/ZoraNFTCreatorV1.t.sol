@@ -84,6 +84,31 @@ contract ZoraFeeManagerTest is DSTest {
         );
     }
 
+    function test_CreateDropAndMint() public {
+        address deployedDrop = creator.createDrop(
+            "name",
+            "symbol",
+            DEFAULT_FUNDS_RECIPIENT_ADDRESS,
+            1000,
+            100,
+            DEFAULT_FUNDS_RECIPIENT_ADDRESS,
+            IERC721Drop.SalesConfiguration({
+                publicSaleStart: 0,
+                publicSaleEnd: uint64(block.timestamp + 1),
+                presaleStart: 0,
+                presaleEnd: 0,
+                publicSalePrice: 0,
+                maxSalePurchasePerAddress: 0,
+                presaleMerkleRoot: bytes32(0)
+            }),
+            "metadata_uri",
+            "metadata_contract_uri"
+        );
+
+        IERC721Drop(deployedDrop).purchase(1);
+        assertEq(IERC721AUpgradeable(deployedDrop).ownerOf(1), address(this));
+    }
+
     function test_CreateGenericDrop() public {
         MockMetadataRenderer mockRenderer = new MockMetadataRenderer();
         address deployedDrop = creator.setupDropsContract(

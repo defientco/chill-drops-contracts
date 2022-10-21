@@ -11,6 +11,7 @@ import {IERC721Drop} from "./interfaces/IERC721Drop.sol";
 import {DropMetadataRenderer} from "./metadata/DropMetadataRenderer.sol";
 import {IMetadataRenderer} from "./interfaces/IMetadataRenderer.sol";
 import {ERC721Drop} from "./ERC721Drop.sol";
+import {Clones} from "@openzeppelin/contracts/proxy/Clones.sol";
 
 /// @notice Zora NFT Creator V1
 contract ZoraNFTCreatorV1 is OwnableUpgradeable, UUPSUpgradeable, Version(2) {
@@ -116,10 +117,10 @@ contract ZoraNFTCreatorV1 is OwnableUpgradeable, UUPSUpgradeable, Version(2) {
         IERC721Drop.SalesConfiguration memory saleConfig,
         IMetadataRenderer metadataRenderer,
         bytes memory metadataInitializer
-    ) public returns (address) {
-        ERC721DropProxy newDrop = new ERC721DropProxy(implementation, "");
+    ) public returns (address newDrop) {
+        newDrop = Clones.clone(implementation);
 
-        address payable newDropAddress = payable(address(newDrop));
+        address payable newDropAddress = payable(newDrop);
 
         ERC721Drop(newDropAddress).initialize(
             name,
