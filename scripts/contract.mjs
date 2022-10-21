@@ -13,7 +13,9 @@ export function timeout(ms) {
 
 export async function deploy(contract, args = undefined) {
   const [contractPath, contractName] = contract.split(":");
-  const constructorArgs = args ? ["--constructor-args", args.join(" ") || '0x'] : [];
+  const constructorArgs = args
+    ? ["--constructor-args", args.join(" ") || "0x"]
+    : [];
   const { stdout, stderr } = await execPromise(
     [
       "forge",
@@ -23,8 +25,6 @@ export async function deploy(contract, args = undefined) {
       process.env.PRIVATE_KEY,
       "--rpc-url",
       process.env.ETH_RPC_URL,
-      "--chain",
-      process.env.CHAIN_ID,
       ...constructorArgs,
       "--json",
     ].join(" ")

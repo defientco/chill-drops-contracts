@@ -11,7 +11,7 @@ import {MockMetadataRenderer} from "./metadata/MockMetadataRenderer.sol";
 import {FactoryUpgradeGate} from "../src/FactoryUpgradeGate.sol";
 import {IERC721AUpgradeable} from "erc721a-upgradeable/IERC721AUpgradeable.sol";
 
-contract ZoraFeeManagerTest is DSTest {
+contract ZoraNFTCreatorV1Test is DSTest {
     Vm public constant vm = Vm(HEVM_ADDRESS);
     address public constant DEFAULT_OWNER_ADDRESS = address(0x23499);
     address payable public constant DEFAULT_FUNDS_RECIPIENT_ADDRESS =
@@ -25,10 +25,7 @@ contract ZoraFeeManagerTest is DSTest {
 
     function setUp() public {
         vm.prank(DEFAULT_ZORA_DAO_ADDRESS);
-        dropImpl = new ERC721Drop(
-            address(1234),
-            FactoryUpgradeGate(address(0))
-        );
+        dropImpl = new ERC721Drop(address(1234));
         editionMetadataRenderer = new EditionMetadataRenderer();
         dropMetadataRenderer = new DropMetadataRenderer();
         ZoraNFTCreatorV1 impl = new ZoraNFTCreatorV1(
@@ -85,6 +82,31 @@ contract ZoraFeeManagerTest is DSTest {
             "metadata_uri",
             "metadata_contract_uri"
         );
+    }
+
+    function test_CreateDropAndMint() public {
+        address deployedDrop = creator.createDrop(
+            "name",
+            "symbol",
+            DEFAULT_FUNDS_RECIPIENT_ADDRESS,
+            1000,
+            100,
+            DEFAULT_FUNDS_RECIPIENT_ADDRESS,
+            IERC721Drop.SalesConfiguration({
+                publicSaleStart: 0,
+                publicSaleEnd: uint64(block.timestamp + 1),
+                presaleStart: 0,
+                presaleEnd: 0,
+                publicSalePrice: 0,
+                maxSalePurchasePerAddress: 0,
+                presaleMerkleRoot: bytes32(0)
+            }),
+            "metadata_uri",
+            "metadata_contract_uri"
+        );
+
+        IERC721Drop(deployedDrop).purchase(1);
+        assertEq(IERC721AUpgradeable(deployedDrop).ownerOf(1), address(this));
     }
 
     function test_CreateGenericDrop() public {

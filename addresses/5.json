@@ -1,0 +1,8 @@
+{
+    "FactoryUpgradeGate": "0xa701dec0d72ae774f00b012744feb4e64edc2a2b",
+    "ERC721Drop": "0x93238fa60b3C9175A2AFBf797E8c3e764ba95D41",
+    "DropMetadataRenderer": "0x9022dfff27e858e36c87ae1acb7d9224e4bb6c63",
+    "EditionMetadataRenderer": "0xb7b2326faa0b00e7c786273e755555031f41963d",
+    "ZoraNFTCreatorV1": "0xFbDC4D06540beBf69312900730c124B29d8E9B28",
+    "ZoraNFTCreatorProxy": "0xcF3275597ce253F04849cE4A278e838771890203"
+}

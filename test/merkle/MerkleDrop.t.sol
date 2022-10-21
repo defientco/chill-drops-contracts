@@ -49,9 +49,7 @@ contract ZoraNFTBaseTest is DSTest {
 
     function setUp() public {
         vm.prank(DEFAULT_ZORA_DAO_ADDRESS);
-        address impl = address(
-            new ERC721Drop(address(1234), FactoryUpgradeGate(address(0)))
-        );
+        address impl = address(new ERC721Drop(address(1234)));
         address payable newDrop = payable(
             address(new ERC721DropProxy(impl, ""))
         );
