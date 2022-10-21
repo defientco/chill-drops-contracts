@@ -3,8 +3,6 @@ pragma solidity ^0.8.10;
 
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
-
-import {ERC721DropProxy} from "./ERC721DropProxy.sol";
 import {Version} from "./utils/Version.sol";
 import {EditionMetadataRenderer} from "./metadata/EditionMetadataRenderer.sol";
 import {IERC721Drop} from "./interfaces/IERC721Drop.sol";
