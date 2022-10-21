@@ -61,6 +61,7 @@ contract ZoraNFTBaseTest is DSTest {
     function test_MerklePurchaseActiveSuccess() public setupZoraNFTBase {
         vm.startPrank(DEFAULT_OWNER_ADDRESS);
         zoraNFTBase.setSaleConfiguration({
+            erc20PaymentToken: address(0),
             publicSaleStart: 0,
             publicSaleEnd: 0,
             presaleStart: 0,
@@ -117,6 +118,7 @@ contract ZoraNFTBaseTest is DSTest {
     {
         vm.startPrank(DEFAULT_OWNER_ADDRESS);
         zoraNFTBase.setSaleConfiguration({
+            erc20PaymentToken: address(0),
             publicSaleStart: 0,
             publicSaleEnd: type(uint64).max,
             presaleStart: 0,
@@ -201,6 +203,7 @@ contract ZoraNFTBaseTest is DSTest {
 
         vm.startPrank(DEFAULT_OWNER_ADDRESS);
         zoraNFTBase.setSaleConfiguration({
+            erc20PaymentToken: address(0),
             publicSaleStart: 0,
             publicSaleEnd: type(uint64).max,
             presaleStart: 0,
@@ -232,6 +235,7 @@ contract ZoraNFTBaseTest is DSTest {
         // block.timestamp returning zero allows sales to go through.
         vm.warp(100);
         zoraNFTBase.setSaleConfiguration({
+            erc20PaymentToken: address(0),
             publicSaleStart: 0,
             publicSaleEnd: 0,
             presaleStart: 0,

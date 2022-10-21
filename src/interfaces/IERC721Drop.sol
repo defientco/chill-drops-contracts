@@ -182,6 +182,34 @@ interface IERC721Drop {
         uint256 maxSupply;
     }
 
+    /// @notice Return value for sales details to use with front-ends
+    struct ERC20SaleDetails {
+        /// @notice Synthesized status variables for sale
+        bool publicSaleActive;
+        /// @notice Synthesized status variables for presale
+        bool presaleActive;
+        /// @notice Price for public sale
+        uint256 publicSalePrice;
+        /// @notice ERC20 contract address for payment. address(0) for ETH.
+        address erc20PaymentToken;
+        /// @notice public sale start
+        uint64 publicSaleStart;
+        /// @notice public sale end
+        uint64 publicSaleEnd;
+        /// @notice Timed sale actions for presale start
+        uint64 presaleStart;
+        /// @notice Timed sale actions for presale end
+        uint64 presaleEnd;
+        /// @notice Merkle root (includes address, quantity, and price data for each entry)
+        bytes32 presaleMerkleRoot;
+        /// @notice Limit public sale to a specific number of mints per wallet
+        uint256 maxSalePurchasePerAddress;
+        /// @notice Total that have been minted
+        uint256 totalMinted;
+        /// @notice The total supply available
+        uint256 maxSupply;
+    }
+
     /// @notice Return type of specific mint counts and details per address
     struct AddressMintDetails {
         /// Number of total mints from the given address
@@ -211,7 +239,7 @@ interface IERC721Drop {
     ) external payable returns (uint256);
 
     /// @notice Function to return the global sales details for the given drop
-    function saleDetails() external view returns (SaleDetails memory);
+    function saleDetails() external view returns (ERC20SaleDetails memory);
 
     /// @notice Function to return the specific sales details for a given address
     /// @param minter address for minter to return mint information for
