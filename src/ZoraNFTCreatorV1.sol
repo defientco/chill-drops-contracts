@@ -112,7 +112,7 @@ contract ZoraNFTCreatorV1 is OwnableUpgradeable, UUPSUpgradeable, Version(2) {
         uint64 editionSize,
         uint16 royaltyBPS,
         address payable fundsRecipient,
-        IERC721Drop.SalesConfiguration memory saleConfig,
+        IERC721Drop.ERC20SalesConfiguration memory saleConfig,
         IMetadataRenderer metadataRenderer,
         bytes memory metadataInitializer
     ) public returns (address newDrop) {
@@ -188,7 +188,7 @@ contract ZoraNFTCreatorV1 is OwnableUpgradeable, UUPSUpgradeable, Version(2) {
         uint64 editionSize,
         uint16 royaltyBPS,
         address payable fundsRecipient,
-        IERC721Drop.SalesConfiguration memory saleConfig,
+        IERC721Drop.ERC20SalesConfiguration memory saleConfig,
         string memory metadataURIBase,
         string memory metadataContractURI
     ) external returns (address) {
@@ -206,80 +206,6 @@ contract ZoraNFTCreatorV1 is OwnableUpgradeable, UUPSUpgradeable, Version(2) {
                 fundsRecipient: fundsRecipient,
                 saleConfig: saleConfig,
                 metadataRenderer: dropMetadataRenderer,
-                metadataInitializer: metadataInitializer
-            });
-    }
-
-    //        ,-.
-    //        `-'
-    //        /|\
-    //         |                    ,----------------.              ,----------.
-    //        / \                   |ZoraNFTCreatorV1|              |ERC721Drop|
-    //      Caller                  `-------+--------'              `----+-----'
-    //        |                      createEdition()                     |
-    //        | --------------------------------------------------------->
-    //        |                             |                            |
-    //        |                             |----.
-    //        |                             |    | initialize NFT metadata
-    //        |                             |<---'
-    //        |                             |                            |
-    //        |                             |           deploy           |
-    //        |                             | --------------------------->
-    //        |                             |                            |
-    //        |                             |     initialize edition     |
-    //        |                             | --------------------------->
-    //        |                             |                            |
-    //        |                             |----.                       |
-    //        |                             |    | emit CreatedDrop      |
-    //        |                             |<---'                       |
-    //        |                             |                            |
-    //        | return drop contract address|                            |
-    //        | <----------------------------                            |
-    //      Caller                  ,-------+--------.              ,----+-----.
-    //        ,-.                   |ZoraNFTCreatorV1|              |ERC721Drop|
-    //        `-'                   `----------------'              `----------'
-    //        /|\
-    //         |
-    //        / \
-    /// @notice Creates a new edition contract as a factory with a deterministic address
-    /// @notice Important: None of these fields (except the Url fields with the same hash) can be changed after calling
-    /// @param name Name of the edition contract
-    /// @param symbol Symbol of the edition contract
-    /// @param defaultAdmin Default admin address
-    /// @param editionSize Total size of the edition (number of possible editions)
-    /// @param royaltyBPS BPS amount of royalty
-    /// @param fundsRecipient Funds recipient for the NFT sale
-    /// @param description Metadata: Description of the edition entry
-    /// @param animationURI Metadata: Animation url (optional) of the edition entry
-    /// @param imageURI Metadata: Image url (semi-required) of the edition entry
-    function createEdition(
-        string memory name,
-        string memory symbol,
-        uint64 editionSize,
-        uint16 royaltyBPS,
-        address payable fundsRecipient,
-        address defaultAdmin,
-        IERC721Drop.SalesConfiguration memory saleConfig,
-        string memory description,
-        string memory animationURI,
-        string memory imageURI
-    ) external returns (address) {
-        bytes memory metadataInitializer = abi.encode(
-            description,
-            imageURI,
-            animationURI
-        );
-
-        return
-            setupDropsContract({
-                name: name,
-                symbol: symbol,
-                defaultAdmin: defaultAdmin,
-                editionSize: editionSize,
-                royaltyBPS: royaltyBPS,
-                saleConfig: saleConfig,
-                fundsRecipient: fundsRecipient,
-                metadataRenderer: editionMetadataRenderer,
                 metadataInitializer: metadataInitializer
             });
     }

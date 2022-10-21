@@ -31,8 +31,9 @@ contract ZoraNFTBaseTest is DSTest {
             _fundsRecipient: payable(DEFAULT_FUNDS_RECIPIENT_ADDRESS),
             _editionSize: 10,
             _royaltyBPS: 800,
-            _salesConfig: IERC721Drop.SalesConfiguration({
+            _salesConfig: IERC721Drop.ERC20SalesConfiguration({
                 publicSaleStart: 0,
+                erc20PaymentToken: address(0),
                 publicSaleEnd: 0,
                 presaleStart: 0,
                 presaleEnd: 0,
@@ -186,8 +187,9 @@ contract ZoraNFTBaseTest is DSTest {
             _royaltyBPS: 800,
             _metadataRenderer: dummyRenderer,
             _metadataRendererInit: "",
-            _salesConfig: IERC721Drop.SalesConfiguration({
+            _salesConfig: IERC721Drop.ERC20SalesConfiguration({
                 publicSaleStart: 0,
+                erc20PaymentToken: address(0),
                 publicSaleEnd: 0,
                 presaleStart: 0,
                 presaleEnd: 0,

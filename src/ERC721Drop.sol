@@ -159,7 +159,7 @@ contract ERC721Drop is
         address payable _fundsRecipient,
         uint64 _editionSize,
         uint16 _royaltyBPS,
-        SalesConfiguration memory _salesConfig,
+        ERC20SalesConfiguration memory _salesConfig,
         IMetadataRenderer _metadataRenderer,
         bytes memory _metadataRendererInit
     ) public initializer {

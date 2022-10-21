@@ -55,8 +55,9 @@ contract ERC721DropTest is DSTest {
             _royaltyBPS: 800,
             _metadataRenderer: dummyRenderer,
             _metadataRendererInit: "",
-            _salesConfig: IERC721Drop.SalesConfiguration({
+            _salesConfig: IERC721Drop.ERC20SalesConfiguration({
                 publicSaleStart: 0,
+                erc20PaymentToken: address(0),
                 publicSaleEnd: 0,
                 presaleStart: 0,
                 presaleEnd: 0,
@@ -116,8 +117,9 @@ contract ERC721DropTest is DSTest {
             _royaltyBPS: 800,
             _metadataRenderer: dummyRenderer,
             _metadataRendererInit: "",
-            _salesConfig: IERC721Drop.SalesConfiguration({
+            _salesConfig: IERC721Drop.ERC20SalesConfiguration({
                 publicSaleStart: 0,
+                erc20PaymentToken: address(0),
                 publicSaleEnd: 0,
                 presaleStart: 0,
                 presaleEnd: 0,
@@ -303,7 +305,7 @@ contract ERC721DropTest is DSTest {
             presaleMerkleRoot: bytes32(0)
         });
 
-        (, , , , , uint64 presaleEndLookup, ) = zoraNFTBase.salesConfig();
+        (, , , , , , uint64 presaleEndLookup, ) = zoraNFTBase.salesConfig();
         assertEq(presaleEndLookup, 100);
 
         address SALES_MANAGER_ADDR = address(0x11002);
@@ -325,6 +327,7 @@ contract ERC721DropTest is DSTest {
         });
 
         (
+            ,
             ,
             ,
             ,
