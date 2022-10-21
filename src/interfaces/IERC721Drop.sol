@@ -133,6 +133,31 @@ interface IERC721Drop {
         bytes32 presaleMerkleRoot;
     }
 
+    /// @notice Sales states and configuration
+    /// @dev Uses 3 storage slots
+    struct ERC20SalesConfiguration {
+        /// @notice Public sale price
+        /// @dev max ether value > 1000 ether with this value
+        uint104 publicSalePrice;
+        /// @dev ERC20 Token
+        address erc20PaymentToken;
+        /// @notice Purchase mint limit per address (if set to 0 === unlimited mints)
+        /// @dev Max purchase number per txn (90+32 = 122)
+        uint32 maxSalePurchasePerAddress;
+        /// @dev uint64 type allows for dates into 292 billion years
+        /// @notice Public sale start timestamp (136+64 = 186)
+        uint64 publicSaleStart;
+        /// @notice Public sale end timestamp (186+64 = 250)
+        uint64 publicSaleEnd;
+        /// @notice Presale start timestamp
+        /// @dev new storage slot
+        uint64 presaleStart;
+        /// @notice Presale end timestamp
+        uint64 presaleEnd;
+        /// @notice Presale merkle root
+        bytes32 presaleMerkleRoot;
+    }
+
     /// @notice Return value for sales details to use with front-ends
     struct SaleDetails {
         // Synthesized status variables for sale and presale
@@ -154,6 +179,34 @@ interface IERC721Drop {
         // Total that have been minted
         uint256 totalMinted;
         // The total supply available
+        uint256 maxSupply;
+    }
+
+    /// @notice Return value for sales details to use with front-ends
+    struct ERC20SaleDetails {
+        /// @notice Synthesized status variables for sale
+        bool publicSaleActive;
+        /// @notice Synthesized status variables for presale
+        bool presaleActive;
+        /// @notice Price for public sale
+        uint256 publicSalePrice;
+        /// @notice ERC20 contract address for payment. address(0) for ETH.
+        address erc20PaymentToken;
+        /// @notice public sale start
+        uint64 publicSaleStart;
+        /// @notice public sale end
+        uint64 publicSaleEnd;
+        /// @notice Timed sale actions for presale start
+        uint64 presaleStart;
+        /// @notice Timed sale actions for presale end
+        uint64 presaleEnd;
+        /// @notice Merkle root (includes address, quantity, and price data for each entry)
+        bytes32 presaleMerkleRoot;
+        /// @notice Limit public sale to a specific number of mints per wallet
+        uint256 maxSalePurchasePerAddress;
+        /// @notice Total that have been minted
+        uint256 totalMinted;
+        /// @notice The total supply available
         uint256 maxSupply;
     }
 
@@ -186,7 +239,7 @@ interface IERC721Drop {
     ) external payable returns (uint256);
 
     /// @notice Function to return the global sales details for the given drop
-    function saleDetails() external view returns (SaleDetails memory);
+    function saleDetails() external view returns (ERC20SaleDetails memory);
 
     /// @notice Function to return the specific sales details for a given address
     /// @param minter address for minter to return mint information for

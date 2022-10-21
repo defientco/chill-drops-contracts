@@ -8,7 +8,7 @@ contract ERC721DropStorageV1 {
     IERC721Drop.Configuration public config;
 
     /// @notice Sales configuration
-    IERC721Drop.SalesConfiguration public salesConfig;
+    IERC721Drop.ERC20SalesConfiguration public salesConfig;
 
     /// @dev Mapping for presale mint counts by address to allow public mint limit
     mapping(address => uint256) public presaleMintsByAddress;

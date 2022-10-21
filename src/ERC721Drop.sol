@@ -21,6 +21,7 @@ import {IERC2981Upgradeable, IERC165Upgradeable} from "@openzeppelin/contracts-u
 import {AccessControlUpgradeable} from "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import {ReentrancyGuardUpgradeable} from "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import {MerkleProofUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/cryptography/MerkleProofUpgradeable.sol";
+import {IERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import {IMetadataRenderer} from "./interfaces/IMetadataRenderer.sol";
 import {IERC721Drop} from "./interfaces/IERC721Drop.sol";
 import {IOwnable} from "./interfaces/IOwnable.sol";
@@ -159,7 +160,7 @@ contract ERC721Drop is
         address payable _fundsRecipient,
         uint64 _editionSize,
         uint16 _royaltyBPS,
-        SalesConfiguration memory _salesConfig,
+        ERC20SalesConfiguration memory _salesConfig,
         IMetadataRenderer _metadataRenderer,
         bytes memory _metadataRendererInit
     ) public initializer {
@@ -241,10 +242,11 @@ contract ERC721Drop is
     function saleDetails()
         external
         view
-        returns (IERC721Drop.SaleDetails memory)
+        returns (IERC721Drop.ERC20SaleDetails memory)
     {
         return
-            IERC721Drop.SaleDetails({
+            IERC721Drop.ERC20SaleDetails({
+                erc20PaymentToken: salesConfig.erc20PaymentToken,
                 publicSaleActive: _publicSaleActive(),
                 presaleActive: _presaleActive(),
                 publicSalePrice: salesConfig.publicSalePrice,
@@ -365,9 +367,19 @@ contract ERC721Drop is
         returns (uint256)
     {
         uint256 salePrice = salesConfig.publicSalePrice;
+        address erc20PaymentToken = salesConfig.erc20PaymentToken;
+        address fundsRecipient = config.fundsRecipient;
 
-        if (msg.value != salePrice * quantity) {
-            revert Purchase_WrongPrice(salePrice * quantity);
+        if (erc20PaymentToken == address(0)) {
+            if (msg.value != salePrice * quantity) {
+                revert Purchase_WrongPrice(salePrice * quantity);
+            }
+        } else {
+            IERC20Upgradeable(erc20PaymentToken).transferFrom(
+                msg.sender,
+                fundsRecipient,
+                salePrice * quantity
+            );
         }
 
         // If max purchase per address == 0 there is no limit.
@@ -746,6 +758,7 @@ contract ERC721Drop is
     /// @dev This sets the sales configuration
     // / @param publicSalePrice New public sale price
     function setSaleConfiguration(
+        address erc20PaymentToken,
         uint104 publicSalePrice,
         uint32 maxSalePurchasePerAddress,
         uint64 publicSaleStart,
@@ -754,15 +767,7 @@ contract ERC721Drop is
         uint64 presaleEnd,
         bytes32 presaleMerkleRoot
     ) external onlyRoleOrAdmin(SALES_MANAGER_ROLE) {
-        // SalesConfiguration storage newConfig = SalesConfiguration({
-        //     publicSaleStart: publicSaleStart,
-        //     publicSaleEnd: publicSaleEnd,
-        //     presaleStart: presaleStart,
-        //     presaleEnd: presaleEnd,
-        //     publicSalePrice: publicSalePrice,
-        //     maxSalePurchasePerAddress: maxSalePurchasePerAddress,
-        //     presaleMerkleRoot: presaleMerkleRoot
-        // });
+        salesConfig.erc20PaymentToken = erc20PaymentToken;
         salesConfig.publicSalePrice = publicSalePrice;
         salesConfig.maxSalePurchasePerAddress = maxSalePurchasePerAddress;
         salesConfig.publicSaleStart = publicSaleStart;

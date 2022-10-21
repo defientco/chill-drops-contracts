@@ -39,29 +39,6 @@ contract ZoraNFTCreatorV1Test is DSTest {
         creator.initialize();
     }
 
-    function test_CreateEdition() public {
-        address deployedEdition = creator.createEdition(
-            "name",
-            "symbol",
-            100,
-            500,
-            DEFAULT_FUNDS_RECIPIENT_ADDRESS,
-            DEFAULT_FUNDS_RECIPIENT_ADDRESS,
-            IERC721Drop.SalesConfiguration({
-                publicSaleStart: 0,
-                publicSaleEnd: 0,
-                presaleStart: 0,
-                presaleEnd: 0,
-                publicSalePrice: 0,
-                maxSalePurchasePerAddress: 0,
-                presaleMerkleRoot: bytes32(0)
-            }),
-            "desc",
-            "animation",
-            "image"
-        );
-    }
-
     function test_CreateDrop() public {
         address deployedDrop = creator.createDrop(
             "name",
@@ -70,8 +47,9 @@ contract ZoraNFTCreatorV1Test is DSTest {
             1000,
             100,
             DEFAULT_FUNDS_RECIPIENT_ADDRESS,
-            IERC721Drop.SalesConfiguration({
+            IERC721Drop.ERC20SalesConfiguration({
                 publicSaleStart: 0,
+                erc20PaymentToken: address(0),
                 publicSaleEnd: 0,
                 presaleStart: 0,
                 presaleEnd: 0,
@@ -92,8 +70,9 @@ contract ZoraNFTCreatorV1Test is DSTest {
             1000,
             100,
             DEFAULT_FUNDS_RECIPIENT_ADDRESS,
-            IERC721Drop.SalesConfiguration({
+            IERC721Drop.ERC20SalesConfiguration({
                 publicSaleStart: 0,
+                erc20PaymentToken: address(0),
                 publicSaleEnd: uint64(block.timestamp + 1),
                 presaleStart: 0,
                 presaleEnd: 0,
@@ -118,8 +97,9 @@ contract ZoraNFTCreatorV1Test is DSTest {
             1000,
             100,
             DEFAULT_FUNDS_RECIPIENT_ADDRESS,
-            IERC721Drop.SalesConfiguration({
+            IERC721Drop.ERC20SalesConfiguration({
                 publicSaleStart: 0,
+                erc20PaymentToken: address(0),
                 publicSaleEnd: type(uint64).max,
                 presaleStart: 0,
                 presaleEnd: 0,

@@ -10,11 +10,12 @@ import {DSTest} from "ds-test/test.sol";
 import {Vm} from "forge-std/Vm.sol";
 
 contract IERC721OnChainDataMock {
-    IERC721Drop.SaleDetails private saleDetailsInternal;
+    IERC721Drop.ERC20SaleDetails private saleDetailsInternal;
     IERC721Drop.Configuration private configInternal;
 
     constructor(uint256 totalMinted, uint256 maxSupply) {
-        saleDetailsInternal = IERC721Drop.SaleDetails({
+        saleDetailsInternal = IERC721Drop.ERC20SaleDetails({
+            erc20PaymentToken: address(0),
             publicSaleActive: false,
             presaleActive: false,
             publicSalePrice: 0,
@@ -40,7 +41,10 @@ contract IERC721OnChainDataMock {
         return "MOCK NAME";
     }
 
-    function saleDetails() external returns (IERC721Drop.SaleDetails memory) {
+    function saleDetails()
+        external
+        returns (IERC721Drop.ERC20SaleDetails memory)
+    {
         return saleDetailsInternal;
     }
 
@@ -160,7 +164,10 @@ contract EditionMetadataRendererTest is DSTest {
             abi.encode("Description", "image", "animation")
         );
         // '{"name": "MOCK NAME 1/100", "description": "Description", "image": "image", "animation_url": "animation", "properties": {"number": 1, "name": "MOCK NAME"}}'
-        assertEq("data:application/json;base64,eyJuYW1lIjogIk1PQ0sgTkFNRSAxLzEwMCIsICJkZXNjcmlwdGlvbiI6ICJEZXNjcmlwdGlvbiIsICJpbWFnZSI6ICJpbWFnZSIsICJhbmltYXRpb25fdXJsIjogImFuaW1hdGlvbiIsICJwcm9wZXJ0aWVzIjogeyJudW1iZXIiOiAxLCAibmFtZSI6ICJNT0NLIE5BTUUifX0=", editionRenderer.tokenURI(1));
+        assertEq(
+            "data:application/json;base64,eyJuYW1lIjogIk1PQ0sgTkFNRSAxLzEwMCIsICJkZXNjcmlwdGlvbiI6ICJEZXNjcmlwdGlvbiIsICJpbWFnZSI6ICJpbWFnZSIsICJhbmltYXRpb25fdXJsIjogImFuaW1hdGlvbiIsICJwcm9wZXJ0aWVzIjogeyJudW1iZXIiOiAxLCAibmFtZSI6ICJNT0NLIE5BTUUifX0=",
+            editionRenderer.tokenURI(1)
+        );
     }
 
     function test_OpenEdition() public {
@@ -173,7 +180,10 @@ contract EditionMetadataRendererTest is DSTest {
             abi.encode("Description", "image", "animation")
         );
         // {"name": "MOCK NAME 1", "description": "Description", "image": "image", "animation_url": "animation", "properties": {"number": 1, "name": "MOCK NAME"}}
-        assertEq("data:application/json;base64,eyJuYW1lIjogIk1PQ0sgTkFNRSAxIiwgImRlc2NyaXB0aW9uIjogIkRlc2NyaXB0aW9uIiwgImltYWdlIjogImltYWdlIiwgImFuaW1hdGlvbl91cmwiOiAiYW5pbWF0aW9uIiwgInByb3BlcnRpZXMiOiB7Im51bWJlciI6IDEsICJuYW1lIjogIk1PQ0sgTkFNRSJ9fQ==", editionRenderer.tokenURI(1));
+        assertEq(
+            "data:application/json;base64,eyJuYW1lIjogIk1PQ0sgTkFNRSAxIiwgImRlc2NyaXB0aW9uIjogIkRlc2NyaXB0aW9uIiwgImltYWdlIjogImltYWdlIiwgImFuaW1hdGlvbl91cmwiOiAiYW5pbWF0aW9uIiwgInByb3BlcnRpZXMiOiB7Im51bWJlciI6IDEsICJuYW1lIjogIk1PQ0sgTkFNRSJ9fQ==",
+            editionRenderer.tokenURI(1)
+        );
     }
 
     function test_ContractURI() public {
@@ -185,6 +195,9 @@ contract EditionMetadataRendererTest is DSTest {
         editionRenderer.initializeWithData(
             abi.encode("Description", "ipfs://image", "ipfs://animation")
         );
-        assertEq("data:application/json;base64,eyJuYW1lIjogIk1PQ0sgTkFNRSIsICJkZXNjcmlwdGlvbiI6ICJEZXNjcmlwdGlvbiIsICJzZWxsZXJfZmVlX2Jhc2lzX3BvaW50cyI6IDEwMDAsICJmZWVfcmVjaXBpZW50IjogIjB4MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDE2MyIsICJpbWFnZSI6ICJpcGZzOi8vaW1hZ2UifQ==", editionRenderer.contractURI());
+        assertEq(
+            "data:application/json;base64,eyJuYW1lIjogIk1PQ0sgTkFNRSIsICJkZXNjcmlwdGlvbiI6ICJEZXNjcmlwdGlvbiIsICJzZWxsZXJfZmVlX2Jhc2lzX3BvaW50cyI6IDEwMDAsICJmZWVfcmVjaXBpZW50IjogIjB4MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDE2MyIsICJpbWFnZSI6ICJpcGZzOi8vaW1hZ2UifQ==",
+            editionRenderer.contractURI()
+        );
     }
 }
