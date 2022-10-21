@@ -4,7 +4,6 @@ pragma solidity ^0.8.10;
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import {Version} from "./utils/Version.sol";
-import {EditionMetadataRenderer} from "./metadata/EditionMetadataRenderer.sol";
 import {IERC721Drop} from "./interfaces/IERC721Drop.sol";
 import {DropMetadataRenderer} from "./metadata/DropMetadataRenderer.sol";
 import {IMetadataRenderer} from "./interfaces/IMetadataRenderer.sol";
@@ -25,30 +24,20 @@ contract ZoraNFTCreatorV1 is OwnableUpgradeable, UUPSUpgradeable, Version(2) {
     /// @notice Address for implementation of ZoraNFTBase to clone
     address public immutable implementation;
 
-    /// @notice Edition metdata renderer
-    EditionMetadataRenderer public immutable editionMetadataRenderer;
-
     /// @notice Drop metdata renderer
     DropMetadataRenderer public immutable dropMetadataRenderer;
 
     /// @notice Initializes factory with address of implementation logic
     /// @param _implementation SingleEditionMintable logic implementation contract to clone
-    /// @param _editionMetadataRenderer Metadata renderer for editions
     /// @param _dropMetadataRenderer Metadata renderer for drops
     constructor(
         address _implementation,
-        EditionMetadataRenderer _editionMetadataRenderer,
         DropMetadataRenderer _dropMetadataRenderer
     ) {
         require(_implementation != address(0), CANNOT_BE_ZERO);
-        require(
-            address(_editionMetadataRenderer) != address(0),
-            CANNOT_BE_ZERO
-        );
         require(address(_dropMetadataRenderer) != address(0), CANNOT_BE_ZERO);
 
         implementation = _implementation;
-        editionMetadataRenderer = _editionMetadataRenderer;
         dropMetadataRenderer = _dropMetadataRenderer;
     }
 
