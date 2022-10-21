@@ -21,6 +21,7 @@ import {IERC2981Upgradeable, IERC165Upgradeable} from "@openzeppelin/contracts-u
 import {AccessControlUpgradeable} from "@openzeppelin/contracts-upgradeable/access/AccessControlUpgradeable.sol";
 import {ReentrancyGuardUpgradeable} from "@openzeppelin/contracts-upgradeable/security/ReentrancyGuardUpgradeable.sol";
 import {MerkleProofUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/cryptography/MerkleProofUpgradeable.sol";
+import {IERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import {IMetadataRenderer} from "./interfaces/IMetadataRenderer.sol";
 import {IERC721Drop} from "./interfaces/IERC721Drop.sol";
 import {IOwnable} from "./interfaces/IOwnable.sol";
@@ -366,9 +367,19 @@ contract ERC721Drop is
         returns (uint256)
     {
         uint256 salePrice = salesConfig.publicSalePrice;
+        address erc20PaymentToken = salesConfig.erc20PaymentToken;
+        address fundsRecipient = config.fundsRecipient;
 
-        if (msg.value != salePrice * quantity) {
-            revert Purchase_WrongPrice(salePrice * quantity);
+        if (erc20PaymentToken == address(0)) {
+            if (msg.value != salePrice * quantity) {
+                revert Purchase_WrongPrice(salePrice * quantity);
+            }
+        } else {
+            IERC20Upgradeable(erc20PaymentToken).transferFrom(
+                msg.sender,
+                fundsRecipient,
+                salePrice * quantity
+            );
         }
 
         // If max purchase per address == 0 there is no limit.

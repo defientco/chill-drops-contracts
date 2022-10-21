@@ -166,9 +166,11 @@ contract ERC721DropTest is DSTest {
         public
         setupZoraNFTBase(10)
     {
+        assertEq(ct.minter(), address(1));
+        assertEq(ct.balanceOf(address(1)), type(uint64).max);
         vm.prank(DEFAULT_OWNER_ADDRESS);
         zoraNFTBase.setSaleConfiguration({
-            erc20PaymentToken: address(0),
+            erc20PaymentToken: address(ct),
             publicSaleStart: 0,
             publicSaleEnd: type(uint64).max,
             presaleStart: 0,
@@ -180,22 +182,28 @@ contract ERC721DropTest is DSTest {
 
         vm.deal(address(456), uint256(amount) * 2);
         vm.prank(address(456));
-        zoraNFTBase.purchase{value: amount}(1);
-
+        if (amount > 0) {
+            vm.expectRevert("ERC20: insufficient allowance");
+            zoraNFTBase.purchase(1);
+        } else {
+            zoraNFTBase.purchase(1);
+            require(
+                zoraNFTBase.ownerOf(1) == address(456),
+                "owner is wrong for new minted token"
+            );
+            assertEq(zoraNFTBase.saleDetails().totalMinted, 1);
+        }
         assertEq(zoraNFTBase.saleDetails().maxSupply, 10);
-        assertEq(zoraNFTBase.saleDetails().totalMinted, 1);
-        assertEq(zoraNFTBase.saleDetails().erc20PaymentToken, address(0));
-        require(
-            zoraNFTBase.ownerOf(1) == address(456),
-            "owner is wrong for new minted token"
-        );
-        assertEq(address(zoraNFTBase).balance, amount);
+        assertEq(zoraNFTBase.saleDetails().erc20PaymentToken, address(ct));
     }
 
     function test_PurchaseERC20(uint64 amount) public setupZoraNFTBase(10) {
+        assertEq(ct.minter(), address(1));
+        assertEq(ct.balanceOf(address(1)), type(uint64).max);
+        assertEq(ct.balanceOf(address(DEFAULT_FUNDS_RECIPIENT_ADDRESS)), 0);
         vm.prank(DEFAULT_OWNER_ADDRESS);
         zoraNFTBase.setSaleConfiguration({
-            erc20PaymentToken: address(0),
+            erc20PaymentToken: address(ct),
             publicSaleStart: 0,
             publicSaleEnd: type(uint64).max,
             presaleStart: 0,
@@ -205,18 +213,22 @@ contract ERC721DropTest is DSTest {
             presaleMerkleRoot: bytes32(0)
         });
 
-        vm.deal(address(456), uint256(amount) * 2);
-        vm.prank(address(456));
-        zoraNFTBase.purchase{value: amount}(1);
-
-        assertEq(zoraNFTBase.saleDetails().maxSupply, 10);
-        assertEq(zoraNFTBase.saleDetails().totalMinted, 1);
-        assertEq(zoraNFTBase.saleDetails().erc20PaymentToken, address(0));
+        vm.prank(address(1));
+        ct.approve(address(zoraNFTBase), type(uint256).max);
+        vm.prank(address(1));
+        zoraNFTBase.purchase(1);
         require(
-            zoraNFTBase.ownerOf(1) == address(456),
+            zoraNFTBase.ownerOf(1) == address(1),
             "owner is wrong for new minted token"
         );
-        assertEq(address(zoraNFTBase).balance, amount);
+        assertEq(zoraNFTBase.saleDetails().totalMinted, 1);
+        assertEq(zoraNFTBase.saleDetails().maxSupply, 10);
+        assertEq(zoraNFTBase.saleDetails().erc20PaymentToken, address(ct));
+        assertEq(ct.balanceOf(address(1)), type(uint64).max - amount);
+        assertEq(
+            ct.balanceOf(address(DEFAULT_FUNDS_RECIPIENT_ADDRESS)),
+            amount
+        );
     }
 
     function test_PurchaseTime() public setupZoraNFTBase(10) {
