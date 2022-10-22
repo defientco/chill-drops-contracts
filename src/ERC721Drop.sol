@@ -32,7 +32,7 @@ import {ERC721DropStorageV1} from "./storage/ERC721DropStorageV1.sol";
  *
  * @dev For drops: assumes 1. linear mint order, 2. max number of mints needs to be less than max_uint64
  *       (if you have more than 18 quintillion linear mints you should probably not be using this contract)
- * @author iain@zora.co
+ * @author iain@zora.co (modified by sw33ts.eth)
  *
  */
 contract ERC721Drop is
