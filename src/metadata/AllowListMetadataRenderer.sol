@@ -25,6 +25,7 @@ contract AllowListMetadataRenderer is
         string description;
         string imageURI;
         string animationURI;
+        string formResponse;
     }
 
     /// @notice Event for updated Media URIs
@@ -41,7 +42,8 @@ contract AllowListMetadataRenderer is
         address indexed target,
         string description,
         string imageURI,
-        string animationURI
+        string animationURI,
+        string formResponse
     );
 
     /// @notice Description updated for this edition
@@ -54,8 +56,6 @@ contract AllowListMetadataRenderer is
 
     /// @notice Token information mapping storage
     mapping(address => TokenEditionInfo) public tokenInfos;
-
-    mapping(address => mapping(uint256 => string)) public formResponseInfo;
 
     /// @notice Update media URIs
     /// @param target target for contract to update metadata for
@@ -99,19 +99,22 @@ contract AllowListMetadataRenderer is
         (
             string memory description,
             string memory imageURI,
-            string memory animationURI
-        ) = abi.decode(data, (string, string, string));
+            string memory animationURI,
+            string memory formResponse
+        ) = abi.decode(data, (string, string, string, string));
 
         tokenInfos[msg.sender] = TokenEditionInfo({
             description: description,
             imageURI: imageURI,
-            animationURI: animationURI
+            animationURI: animationURI,
+            formResponse: formResponse
         });
         emit EditionInitialized({
             target: msg.sender,
             description: description,
             imageURI: imageURI,
-            animationURI: animationURI
+            animationURI: animationURI,
+            formResponse: formResponse
         });
     }
 
