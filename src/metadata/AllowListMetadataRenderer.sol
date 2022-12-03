@@ -15,8 +15,8 @@ interface DropConfigGetter {
         returns (IERC721Drop.Configuration memory config);
 }
 
-/// @notice EditionMetadataRenderer for editions support
-contract EditionMetadataRenderer is
+/// @notice AllowListMetadataRenderer for allow list support
+contract AllowListMetadataRenderer is
     IMetadataRenderer,
     MetadataRenderAdminCheck
 {
