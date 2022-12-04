@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.10;
+pragma solidity ^0.8.15;
 
 import {DSTest} from "ds-test/test.sol";
 import {Vm} from "forge-std/Vm.sol";
@@ -8,6 +8,7 @@ import {IMetadataRenderer} from "../src/interfaces/IMetadataRenderer.sol";
 import "../src/ZoraNFTCreatorV1.sol";
 import "../src/ZoraNFTCreatorProxy.sol";
 import {MockMetadataRenderer} from "./metadata/MockMetadataRenderer.sol";
+import {AllowListMetadataRenderer} from "../src/metadata/AllowListMetadataRenderer.sol";
 import {FactoryUpgradeGate} from "../src/FactoryUpgradeGate.sol";
 import {IERC721AUpgradeable} from "erc721a-upgradeable/IERC721AUpgradeable.sol";
 
@@ -37,7 +38,7 @@ contract ZoraNFTCreatorV1Test is DSTest {
     }
 
     function test_CreateDrop() public {
-        address deployedDrop = creator.createDrop(
+        creator.createDrop(
             "name",
             "symbol",
             DEFAULT_FUNDS_RECIPIENT_ADDRESS,
@@ -118,7 +119,7 @@ contract ZoraNFTCreatorV1Test is DSTest {
     }
 
     function test_CreateAllowList() public {
-        address deployedDrop = creator.createAllowList(
+        creator.createAllowList(
             "name",
             "symbol",
             DEFAULT_FUNDS_RECIPIENT_ADDRESS,
@@ -135,8 +136,10 @@ contract ZoraNFTCreatorV1Test is DSTest {
                 maxSalePurchasePerAddress: 0,
                 presaleMerkleRoot: bytes32(0)
             }),
-            "metadata_uri",
-            "metadata_contract_uri"
+            "Description for metadata",
+            "https://example.com/image.png",
+            "https://example.com/animation.mp4",
+            "i love web3"
         );
     }
 
@@ -158,11 +161,51 @@ contract ZoraNFTCreatorV1Test is DSTest {
                 maxSalePurchasePerAddress: 0,
                 presaleMerkleRoot: bytes32(0)
             }),
-            "metadata_uri",
-            "metadata_contract_uri"
+            "Description for metadata",
+            "https://example.com/image.png",
+            "https://example.com/animation.mp4",
+            "i love web3"
         );
 
         IERC721Drop(deployedDrop).purchase(1);
         assertEq(IERC721AUpgradeable(deployedDrop).ownerOf(1), address(this));
+    }
+
+    function test_CreateAllowListDrop() public {
+        AllowListMetadataRenderer mockRenderer = new AllowListMetadataRenderer();
+        bytes memory data = abi.encode(
+            "Description for metadata",
+            "https://example.com/image.png",
+            "https://example.com/animation.mp4",
+            "i love web3"
+        );
+        address deployedDrop = creator.setupDropsContract(
+            "name",
+            "symbol",
+            DEFAULT_FUNDS_RECIPIENT_ADDRESS,
+            1000,
+            100,
+            DEFAULT_FUNDS_RECIPIENT_ADDRESS,
+            IERC721Drop.ERC20SalesConfiguration({
+                publicSaleStart: 0,
+                erc20PaymentToken: address(0),
+                publicSaleEnd: type(uint64).max,
+                presaleStart: 0,
+                presaleEnd: 0,
+                publicSalePrice: 0,
+                maxSalePurchasePerAddress: 0,
+                presaleMerkleRoot: bytes32(0)
+            }),
+            mockRenderer,
+            data
+        );
+        // ERC721Drop drop = ERC721Drop(payable(deployedDrop));
+        // vm.expectRevert(
+        //     IERC721AUpgradeable.URIQueryForNonexistentToken.selector
+        // );
+        // drop.tokenURI(1);
+        // assertEq(drop.contractURI(), "DEMO");
+        // drop.purchase(1);
+        // assertEq(drop.tokenURI(1), "DEMO");
     }
 }
