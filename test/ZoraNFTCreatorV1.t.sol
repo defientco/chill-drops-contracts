@@ -116,4 +116,27 @@ contract ZoraNFTCreatorV1Test is DSTest {
         drop.purchase(1);
         assertEq(drop.tokenURI(1), "DEMO");
     }
+
+    function test_CreateAllowList() public {
+        address deployedDrop = creator.createAllowList(
+            "name",
+            "symbol",
+            DEFAULT_FUNDS_RECIPIENT_ADDRESS,
+            1000,
+            100,
+            DEFAULT_FUNDS_RECIPIENT_ADDRESS,
+            IERC721Drop.ERC20SalesConfiguration({
+                publicSaleStart: 0,
+                erc20PaymentToken: address(0),
+                publicSaleEnd: 0,
+                presaleStart: 0,
+                presaleEnd: 0,
+                publicSalePrice: 0,
+                maxSalePurchasePerAddress: 0,
+                presaleMerkleRoot: bytes32(0)
+            }),
+            "metadata_uri",
+            "metadata_contract_uri"
+        );
+    }
 }
