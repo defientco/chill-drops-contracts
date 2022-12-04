@@ -214,7 +214,7 @@ contract ZoraNFTCreatorV1Test is DSTest {
         drop.purchase(1);
         assertEq(
             drop.tokenURI(1),
-            "data:application/json;base64,eyJuYW1lIjogIm5hbWUgMS8xMDAwIiwgImRlc2NyaXB0aW9uIjogIkRlc2NyaXB0aW9uIGZvciBtZXRhZGF0YSIsICJpbWFnZSI6ICJodHRwczovL2V4YW1wbGUuY29tL2ltYWdlLnBuZyIsICJhbmltYXRpb25fdXJsIjogImh0dHBzOi8vZXhhbXBsZS5jb20vYW5pbWF0aW9uLm1wNCIsICJwcm9wZXJ0aWVzIjogeyJudW1iZXIiOiAxLCAibmFtZSI6ICJuYW1lIn19"
+            "data:application/json;base64,eyJuYW1lIjogIm5hbWUgMS8xMDAwIiwgImRlc2NyaXB0aW9uIjogIkRlc2NyaXB0aW9uIGZvciBtZXRhZGF0YSBpIGxvdmUgd2ViMyIsICJpbWFnZSI6ICJodHRwczovL2V4YW1wbGUuY29tL2ltYWdlLnBuZyIsICJhbmltYXRpb25fdXJsIjogImh0dHBzOi8vZXhhbXBsZS5jb20vYW5pbWF0aW9uLm1wNCIsICJwcm9wZXJ0aWVzIjogeyJudW1iZXIiOiAxLCAibmFtZSI6ICJuYW1lIn19"
         );
     }
 }
