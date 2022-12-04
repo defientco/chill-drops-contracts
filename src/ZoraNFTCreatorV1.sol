@@ -130,6 +130,36 @@ contract ZoraNFTCreatorV1 is OwnableUpgradeable, UUPSUpgradeable, Version(2) {
         return newDropAddress;
     }
 
+    function createBase(
+        string memory name,
+        string memory symbol,
+        address defaultAdmin,
+        uint64 editionSize,
+        uint16 royaltyBPS,
+        address payable fundsRecipient,
+        IERC721Drop.ERC20SalesConfiguration memory saleConfig,
+        string memory metadataURIBase,
+        string memory metadataContractURI,
+        IMetadataRenderer metadataRenderer
+    ) internal returns (address) {
+        bytes memory metadataInitializer = abi.encode(
+            metadataURIBase,
+            metadataContractURI
+        );
+        return
+            setupDropsContract({
+                defaultAdmin: defaultAdmin,
+                name: name,
+                symbol: symbol,
+                royaltyBPS: royaltyBPS,
+                editionSize: editionSize,
+                fundsRecipient: fundsRecipient,
+                saleConfig: saleConfig,
+                metadataRenderer: metadataRenderer,
+                metadataInitializer: metadataInitializer
+            });
+    }
+
     //        ,-.
     //        `-'
     //        /|\
@@ -181,12 +211,8 @@ contract ZoraNFTCreatorV1 is OwnableUpgradeable, UUPSUpgradeable, Version(2) {
         string memory metadataURIBase,
         string memory metadataContractURI
     ) external returns (address) {
-        bytes memory metadataInitializer = abi.encode(
-            metadataURIBase,
-            metadataContractURI
-        );
         return
-            setupDropsContract({
+            createBase({
                 defaultAdmin: defaultAdmin,
                 name: name,
                 symbol: symbol,
@@ -194,8 +220,9 @@ contract ZoraNFTCreatorV1 is OwnableUpgradeable, UUPSUpgradeable, Version(2) {
                 editionSize: editionSize,
                 fundsRecipient: fundsRecipient,
                 saleConfig: saleConfig,
-                metadataRenderer: dropMetadataRenderer,
-                metadataInitializer: metadataInitializer
+                metadataURIBase: metadataURIBase,
+                metadataContractURI: metadataContractURI,
+                metadataRenderer: dropMetadataRenderer
             });
     }
 
@@ -219,12 +246,8 @@ contract ZoraNFTCreatorV1 is OwnableUpgradeable, UUPSUpgradeable, Version(2) {
         string memory metadataURIBase,
         string memory metadataContractURI
     ) external returns (address) {
-        bytes memory metadataInitializer = abi.encode(
-            metadataURIBase,
-            metadataContractURI
-        );
         return
-            setupDropsContract({
+            createBase({
                 defaultAdmin: defaultAdmin,
                 name: name,
                 symbol: symbol,
@@ -232,8 +255,9 @@ contract ZoraNFTCreatorV1 is OwnableUpgradeable, UUPSUpgradeable, Version(2) {
                 editionSize: editionSize,
                 fundsRecipient: fundsRecipient,
                 saleConfig: saleConfig,
-                metadataRenderer: dropMetadataRenderer,
-                metadataInitializer: metadataInitializer
+                metadataURIBase: metadataURIBase,
+                metadataContractURI: metadataContractURI,
+                metadataRenderer: dropMetadataRenderer
             });
     }
 }
