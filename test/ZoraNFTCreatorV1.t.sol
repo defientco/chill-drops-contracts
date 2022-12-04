@@ -37,7 +37,7 @@ contract ZoraNFTCreatorV1Test is DSTest {
     }
 
     function test_CreateDrop() public {
-        address deployedAllowList = creator.createDrop(
+        address deployedDrop = creator.createDrop(
             "name",
             "symbol",
             DEFAULT_FUNDS_RECIPIENT_ADDRESS,
@@ -60,7 +60,7 @@ contract ZoraNFTCreatorV1Test is DSTest {
     }
 
     function test_CreateDropAndMint() public {
-        address deployedAllowList = creator.createDrop(
+        address deployedDrop = creator.createDrop(
             "name",
             "symbol",
             DEFAULT_FUNDS_RECIPIENT_ADDRESS,
@@ -81,16 +81,13 @@ contract ZoraNFTCreatorV1Test is DSTest {
             "metadata_contract_uri"
         );
 
-        IERC721Drop(deployedAllowList).purchase(1);
-        assertEq(
-            IERC721AUpgradeable(deployedAllowList).ownerOf(1),
-            address(this)
-        );
+        IERC721Drop(deployedDrop).purchase(1);
+        assertEq(IERC721AUpgradeable(deployedDrop).ownerOf(1), address(this));
     }
 
     function test_CreateGenericDrop() public {
         MockMetadataRenderer mockRenderer = new MockMetadataRenderer();
-        address deployedAllowList = creator.setupDropsContract(
+        address deployedDrop = creator.setupDropsContract(
             "name",
             "symbol",
             DEFAULT_FUNDS_RECIPIENT_ADDRESS,
@@ -110,7 +107,7 @@ contract ZoraNFTCreatorV1Test is DSTest {
             mockRenderer,
             ""
         );
-        ERC721Drop drop = ERC721Drop(payable(deployedAllowList));
+        ERC721Drop drop = ERC721Drop(payable(deployedDrop));
         vm.expectRevert(
             IERC721AUpgradeable.URIQueryForNonexistentToken.selector
         );
@@ -121,7 +118,7 @@ contract ZoraNFTCreatorV1Test is DSTest {
     }
 
     function test_CreateAllowList() public {
-        address deployedAllowList = creator.createAllowList(
+        address deployedDrop = creator.createAllowList(
             "name",
             "symbol",
             DEFAULT_FUNDS_RECIPIENT_ADDRESS,
@@ -144,7 +141,7 @@ contract ZoraNFTCreatorV1Test is DSTest {
     }
 
     function test_CreateAllowListAndMint() public {
-        address deployedAllowList = creator.createAllowList(
+        address deployedDrop = creator.createAllowList(
             "name",
             "symbol",
             DEFAULT_FUNDS_RECIPIENT_ADDRESS,
@@ -165,10 +162,7 @@ contract ZoraNFTCreatorV1Test is DSTest {
             "metadata_contract_uri"
         );
 
-        IERC721Drop(deployedAllowList).purchase(1);
-        assertEq(
-            IERC721AUpgradeable(deployedAllowList).ownerOf(1),
-            address(this)
-        );
+        IERC721Drop(deployedDrop).purchase(1);
+        assertEq(IERC721AUpgradeable(deployedDrop).ownerOf(1), address(this));
     }
 }
