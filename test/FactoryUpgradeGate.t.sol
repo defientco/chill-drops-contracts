@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: MIT
-pragma solidity 0.8.10;
+pragma solidity ^0.8.15;
 
 import {Vm} from "forge-std/Vm.sol";
 import {DSTest} from "ds-test/test.sol";
@@ -15,7 +15,7 @@ contract FactoryUpgradeGateTest is DSTest {
         gate = new FactoryUpgradeGate(address(0xad));
     }
 
-    function test_GateBlockedByDefault() public {
+    function test_GateBlockedByDefault() public view {
         assert(!gate.isValidUpgradePath(address(0x0), address(0x0)));
     }
 
