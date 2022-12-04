@@ -199,13 +199,19 @@ contract ZoraNFTCreatorV1Test is DSTest {
             mockRenderer,
             data
         );
-        // ERC721Drop drop = ERC721Drop(payable(deployedDrop));
-        // vm.expectRevert(
-        //     IERC721AUpgradeable.URIQueryForNonexistentToken.selector
-        // );
-        // drop.tokenURI(1);
-        // assertEq(drop.contractURI(), "DEMO");
-        // drop.purchase(1);
-        // assertEq(drop.tokenURI(1), "DEMO");
+        ERC721Drop drop = ERC721Drop(payable(deployedDrop));
+        vm.expectRevert(
+            IERC721AUpgradeable.URIQueryForNonexistentToken.selector
+        );
+        drop.tokenURI(1);
+        assertEq(
+            drop.contractURI(),
+            "data:application/json;base64,eyJuYW1lIjogIm5hbWUiLCAiZGVzY3JpcHRpb24iOiAiRGVzY3JpcHRpb24gZm9yIG1ldGFkYXRhIiwgInNlbGxlcl9mZWVfYmFzaXNfcG9pbnRzIjogMTAwLCAiZmVlX3JlY2lwaWVudCI6ICIweDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMjEzMDMiLCAiaW1hZ2UiOiAiaHR0cHM6Ly9leGFtcGxlLmNvbS9pbWFnZS5wbmcifQ=="
+        );
+        drop.purchase(1);
+        assertEq(
+            drop.tokenURI(1),
+            "data:application/json;base64,eyJuYW1lIjogIm5hbWUgMS8xMDAwIiwgImRlc2NyaXB0aW9uIjogIkRlc2NyaXB0aW9uIGZvciBtZXRhZGF0YSIsICJpbWFnZSI6ICJodHRwczovL2V4YW1wbGUuY29tL2ltYWdlLnBuZyIsICJhbmltYXRpb25fdXJsIjogImh0dHBzOi8vZXhhbXBsZS5jb20vYW5pbWF0aW9uLm1wNCIsICJwcm9wZXJ0aWVzIjogeyJudW1iZXIiOiAxLCAibmFtZSI6ICJuYW1lIn19"
+        );
     }
 }
