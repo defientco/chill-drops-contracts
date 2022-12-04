@@ -30,7 +30,7 @@ export async function setupContracts() {
 
   console.log('deploying allowlist metadata renderer');
   const allowlistMetadataContract = await deployAndVerify(
-    'src/metadata/AllowlistMetadataRenderer.sol:AllowlistMetadataRenderer',
+    'src/metadata/AllowListMetadataRenderer.sol:AllowListMetadataRenderer',
     []
   );
   const allowlistMetadataAddress = allowlistMetadataContract.deployed.deploy.deployedTo;
