@@ -198,4 +198,42 @@ contract ZoraNFTCreatorV1 is OwnableUpgradeable, UUPSUpgradeable, Version(2) {
                 metadataInitializer: metadataInitializer
             });
     }
+
+    /// @dev Setup the media contract for a drop
+    /// @param name Name for new contract (cannot be changed)
+    /// @param symbol Symbol for new contract (cannot be changed)
+    /// @param defaultAdmin Default admin address
+    /// @param editionSize The max size of the media contract allowed
+    /// @param royaltyBPS BPS for on-chain royalties (cannot be changed)
+    /// @param fundsRecipient recipient for sale funds and, unless overridden, royalties
+    /// @param metadataURIBase URI Base for metadata
+    /// @param metadataContractURI URI for contract metadata
+    function createAllowList(
+        string memory name,
+        string memory symbol,
+        address defaultAdmin,
+        uint64 editionSize,
+        uint16 royaltyBPS,
+        address payable fundsRecipient,
+        IERC721Drop.ERC20SalesConfiguration memory saleConfig,
+        string memory metadataURIBase,
+        string memory metadataContractURI
+    ) external returns (address) {
+        bytes memory metadataInitializer = abi.encode(
+            metadataURIBase,
+            metadataContractURI
+        );
+        return
+            setupDropsContract({
+                defaultAdmin: defaultAdmin,
+                name: name,
+                symbol: symbol,
+                royaltyBPS: royaltyBPS,
+                editionSize: editionSize,
+                fundsRecipient: fundsRecipient,
+                saleConfig: saleConfig,
+                metadataRenderer: dropMetadataRenderer,
+                metadataInitializer: metadataInitializer
+            });
+    }
 }
