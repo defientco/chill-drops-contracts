@@ -6,6 +6,7 @@ import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/U
 import {Version} from "./utils/Version.sol";
 import {IERC721Drop} from "./interfaces/IERC721Drop.sol";
 import {DropMetadataRenderer} from "./metadata/DropMetadataRenderer.sol";
+import {AllowListMetadataRenderer} from "./metadata/AllowListMetadataRenderer.sol";
 import {IMetadataRenderer} from "./interfaces/IMetadataRenderer.sol";
 import {ERC721Drop} from "./ERC721Drop.sol";
 import {Clones} from "@openzeppelin/contracts/proxy/Clones.sol";
@@ -27,18 +28,23 @@ contract ZoraNFTCreatorV1 is OwnableUpgradeable, UUPSUpgradeable, Version(2) {
     /// @notice Drop metdata renderer
     DropMetadataRenderer public immutable dropMetadataRenderer;
 
+    /// @notice Allow list metadata renderer
+    AllowListMetadataRenderer public immutable allowListMetadataRenderer;
+
     /// @notice Initializes factory with address of implementation logic
     /// @param _implementation SingleEditionMintable logic implementation contract to clone
     /// @param _dropMetadataRenderer Metadata renderer for drops
     constructor(
         address _implementation,
-        DropMetadataRenderer _dropMetadataRenderer
+        DropMetadataRenderer _dropMetadataRenderer,
+        AllowListMetadataRenderer _allowListMetadataRenderer
     ) {
         require(_implementation != address(0), CANNOT_BE_ZERO);
         require(address(_dropMetadataRenderer) != address(0), CANNOT_BE_ZERO);
 
         implementation = _implementation;
         dropMetadataRenderer = _dropMetadataRenderer;
+        allowListMetadataRenderer = _allowListMetadataRenderer;
     }
 
     /// @dev Initializes the proxy contract
@@ -263,7 +269,7 @@ contract ZoraNFTCreatorV1 is OwnableUpgradeable, UUPSUpgradeable, Version(2) {
                 editionSize: editionSize,
                 fundsRecipient: fundsRecipient,
                 saleConfig: saleConfig,
-                metadataRenderer: dropMetadataRenderer,
+                metadataRenderer: allowListMetadataRenderer,
                 metadataInitializer: metadataInitializer
             });
     }
