@@ -37,18 +37,19 @@ contract IERC721OnChainDataMock {
         });
     }
 
-    function name() external returns (string memory) {
+    function name() external pure returns (string memory) {
         return "MOCK NAME";
     }
 
     function saleDetails()
         external
+        view
         returns (IERC721Drop.ERC20SaleDetails memory)
     {
         return saleDetailsInternal;
     }
 
-    function config() external returns (IERC721Drop.Configuration memory) {
+    function config() external view returns (IERC721Drop.Configuration memory) {
         return configInternal;
     }
 }
