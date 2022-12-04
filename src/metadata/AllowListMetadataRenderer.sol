@@ -160,11 +160,15 @@ contract AllowListMetadataRenderer is
         if (maxSupply == type(uint64).max) {
             maxSupply = 0;
         }
-
+        string memory description = string.concat(
+            info.description,
+            " ",
+            info.formResponse
+        );
         return
             NFTMetadataRenderer.createMetadataEdition({
                 name: IERC721MetadataUpgradeable(target).name(),
-                description: info.description,
+                description: description,
                 imageUrl: info.imageURI,
                 animationUrl: info.animationURI,
                 tokenOfEdition: tokenId,
