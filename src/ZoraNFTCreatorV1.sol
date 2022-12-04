@@ -138,14 +138,9 @@ contract ZoraNFTCreatorV1 is OwnableUpgradeable, UUPSUpgradeable, Version(2) {
         uint16 royaltyBPS,
         address payable fundsRecipient,
         IERC721Drop.ERC20SalesConfiguration memory saleConfig,
-        string memory metadataURIBase,
-        string memory metadataContractURI,
-        IMetadataRenderer metadataRenderer
+        IMetadataRenderer metadataRenderer,
+        bytes memory metadataInitializer
     ) internal returns (address) {
-        bytes memory metadataInitializer = abi.encode(
-            metadataURIBase,
-            metadataContractURI
-        );
         return
             setupDropsContract({
                 defaultAdmin: defaultAdmin,
@@ -211,6 +206,10 @@ contract ZoraNFTCreatorV1 is OwnableUpgradeable, UUPSUpgradeable, Version(2) {
         string memory metadataURIBase,
         string memory metadataContractURI
     ) external returns (address) {
+        bytes memory metadataInitializer = abi.encode(
+            metadataURIBase,
+            metadataContractURI
+        );
         return
             createBase({
                 defaultAdmin: defaultAdmin,
@@ -220,21 +219,22 @@ contract ZoraNFTCreatorV1 is OwnableUpgradeable, UUPSUpgradeable, Version(2) {
                 editionSize: editionSize,
                 fundsRecipient: fundsRecipient,
                 saleConfig: saleConfig,
-                metadataURIBase: metadataURIBase,
-                metadataContractURI: metadataContractURI,
-                metadataRenderer: dropMetadataRenderer
+                metadataRenderer: dropMetadataRenderer,
+                metadataInitializer: metadataInitializer
             });
     }
 
-    /// @dev Setup the media contract for a drop
+    /// @dev Setup the media contract for a allow list
     /// @param name Name for new contract (cannot be changed)
     /// @param symbol Symbol for new contract (cannot be changed)
     /// @param defaultAdmin Default admin address
     /// @param editionSize The max size of the media contract allowed
     /// @param royaltyBPS BPS for on-chain royalties (cannot be changed)
     /// @param fundsRecipient recipient for sale funds and, unless overridden, royalties
-    /// @param metadataURIBase URI Base for metadata
-    /// @param metadataContractURI URI for contract metadata
+    /// @param description Description for the media
+    /// @param imageURI URI for the media
+    /// @param animationURI URI for the animation
+    /// @param formResponse URI for the form response
     function createAllowList(
         string memory name,
         string memory symbol,
@@ -243,9 +243,17 @@ contract ZoraNFTCreatorV1 is OwnableUpgradeable, UUPSUpgradeable, Version(2) {
         uint16 royaltyBPS,
         address payable fundsRecipient,
         IERC721Drop.ERC20SalesConfiguration memory saleConfig,
-        string memory metadataURIBase,
-        string memory metadataContractURI
+        string memory description,
+        string memory imageURI,
+        string memory animationURI,
+        string memory formResponse
     ) external returns (address) {
+        bytes memory metadataInitializer = abi.encode(
+            description,
+            imageURI,
+            animationURI,
+            formResponse
+        );
         return
             createBase({
                 defaultAdmin: defaultAdmin,
@@ -255,9 +263,8 @@ contract ZoraNFTCreatorV1 is OwnableUpgradeable, UUPSUpgradeable, Version(2) {
                 editionSize: editionSize,
                 fundsRecipient: fundsRecipient,
                 saleConfig: saleConfig,
-                metadataURIBase: metadataURIBase,
-                metadataContractURI: metadataContractURI,
-                metadataRenderer: dropMetadataRenderer
+                metadataRenderer: dropMetadataRenderer,
+                metadataInitializer: metadataInitializer
             });
     }
 }
