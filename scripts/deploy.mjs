@@ -28,16 +28,26 @@ export async function setupContracts() {
   const dropMetadataAddress = dropMetadataContract.deployed.deploy.deployedTo;
   console.log('deployed drops metadata to', dropMetadataAddress);
 
+  console.log('deploying allowlist metadata renderer');
+  const allowlistMetadataContract = await deployAndVerify(
+    'src/metadata/AllowlistMetadataRenderer.sol:AllowlistMetadataRenderer',
+    []
+  );
+  const allowlistMetadataAddress = allowlistMetadataContract.deployed.deploy.deployedTo;
+  console.log('deployed allowlist metadata to', allowlistMetadataAddress);
+
   console.log('deploying creator implementation');
   const creatorImpl = await deployAndVerify('src/ZoraNFTCreatorV1.sol:ZoraNFTCreatorV1', [
     dropContractAddress,
-    dropMetadataAddress
+    dropMetadataAddress,
+    allowlistMetadataAddress
   ]);
   console.log('deployed creator implementation to', creatorImpl.deployed.deploy.deployedTo);
 
   return {
     dropContract,
     dropMetadataContract,
+    allowlistMetadataContract,
     creatorImpl
   };
 }
