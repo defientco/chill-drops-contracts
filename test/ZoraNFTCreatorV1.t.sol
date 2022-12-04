@@ -37,7 +37,7 @@ contract ZoraNFTCreatorV1Test is DSTest {
     }
 
     function test_CreateDrop() public {
-        address deployedDrop = creator.createDrop(
+        address deployedAllowList = creator.createDrop(
             "name",
             "symbol",
             DEFAULT_FUNDS_RECIPIENT_ADDRESS,
@@ -60,7 +60,7 @@ contract ZoraNFTCreatorV1Test is DSTest {
     }
 
     function test_CreateDropAndMint() public {
-        address deployedDrop = creator.createDrop(
+        address deployedAllowList = creator.createDrop(
             "name",
             "symbol",
             DEFAULT_FUNDS_RECIPIENT_ADDRESS,
@@ -81,13 +81,16 @@ contract ZoraNFTCreatorV1Test is DSTest {
             "metadata_contract_uri"
         );
 
-        IERC721Drop(deployedDrop).purchase(1);
-        assertEq(IERC721AUpgradeable(deployedDrop).ownerOf(1), address(this));
+        IERC721Drop(deployedAllowList).purchase(1);
+        assertEq(
+            IERC721AUpgradeable(deployedAllowList).ownerOf(1),
+            address(this)
+        );
     }
 
     function test_CreateGenericDrop() public {
         MockMetadataRenderer mockRenderer = new MockMetadataRenderer();
-        address deployedDrop = creator.setupDropsContract(
+        address deployedAllowList = creator.setupDropsContract(
             "name",
             "symbol",
             DEFAULT_FUNDS_RECIPIENT_ADDRESS,
@@ -107,7 +110,7 @@ contract ZoraNFTCreatorV1Test is DSTest {
             mockRenderer,
             ""
         );
-        ERC721Drop drop = ERC721Drop(payable(deployedDrop));
+        ERC721Drop drop = ERC721Drop(payable(deployedAllowList));
         vm.expectRevert(
             IERC721AUpgradeable.URIQueryForNonexistentToken.selector
         );
@@ -118,7 +121,7 @@ contract ZoraNFTCreatorV1Test is DSTest {
     }
 
     function test_CreateAllowList() public {
-        address deployedDrop = creator.createAllowList(
+        address deployedAllowList = creator.createAllowList(
             "name",
             "symbol",
             DEFAULT_FUNDS_RECIPIENT_ADDRESS,
@@ -137,6 +140,35 @@ contract ZoraNFTCreatorV1Test is DSTest {
             }),
             "metadata_uri",
             "metadata_contract_uri"
+        );
+    }
+
+    function test_CreateAllowListAndMint() public {
+        address deployedAllowList = creator.createAllowList(
+            "name",
+            "symbol",
+            DEFAULT_FUNDS_RECIPIENT_ADDRESS,
+            1000,
+            100,
+            DEFAULT_FUNDS_RECIPIENT_ADDRESS,
+            IERC721Drop.ERC20SalesConfiguration({
+                publicSaleStart: 0,
+                erc20PaymentToken: address(0),
+                publicSaleEnd: uint64(block.timestamp + 1),
+                presaleStart: 0,
+                presaleEnd: 0,
+                publicSalePrice: 0,
+                maxSalePurchasePerAddress: 0,
+                presaleMerkleRoot: bytes32(0)
+            }),
+            "metadata_uri",
+            "metadata_contract_uri"
+        );
+
+        IERC721Drop(deployedAllowList).purchase(1);
+        assertEq(
+            IERC721AUpgradeable(deployedAllowList).ownerOf(1),
+            address(this)
         );
     }
 }
