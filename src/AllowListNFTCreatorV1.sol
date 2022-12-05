@@ -12,7 +12,11 @@ import {Clones} from "@openzeppelin/contracts/proxy/Clones.sol";
 import {AllowListMetadataRenderer} from "./metadata/AllowListMetadataRenderer.sol";
 
 /// @notice Zora NFT Creator V1
-contract AllowListCreatorV1 is OwnableUpgradeable, UUPSUpgradeable, Version(2) {
+contract AllowListNFTCreatorV1 is
+    OwnableUpgradeable,
+    UUPSUpgradeable,
+    Version(2)
+{
     string private constant CANNOT_BE_ZERO = "Cannot be 0 address";
 
     /// @notice Emitted when a edition is created reserving the corresponding token IDs.

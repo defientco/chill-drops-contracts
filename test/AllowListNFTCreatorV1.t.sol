@@ -5,7 +5,7 @@ import {DSTest} from "ds-test/test.sol";
 import {Vm} from "forge-std/Vm.sol";
 
 import {IMetadataRenderer} from "../src/interfaces/IMetadataRenderer.sol";
-import "../src/AllowListCreatorV1.sol";
+import "../src/AllowListNFTCreatorV1.sol";
 import "../src/ZoraNFTCreatorProxy.sol";
 import {MockMetadataRenderer} from "./metadata/MockMetadataRenderer.sol";
 import {AllowListMetadataRenderer} from "../src/metadata/AllowListMetadataRenderer.sol";
@@ -20,7 +20,7 @@ contract ZoraNFTCreatorV1Test is DSTest {
     address payable public constant DEFAULT_ZORA_DAO_ADDRESS =
         payable(address(0x999));
     AllowListDrop public dropImpl;
-    AllowListCreatorV1 public creator;
+    AllowListNFTCreatorV1 public creator;
     DropMetadataRenderer public dropMetadataRenderer;
     AllowListMetadataRenderer public allowListMetadataRenderer;
 
@@ -29,12 +29,12 @@ contract ZoraNFTCreatorV1Test is DSTest {
         dropImpl = new AllowListDrop(address(1234));
         dropMetadataRenderer = new DropMetadataRenderer();
         allowListMetadataRenderer = new AllowListMetadataRenderer();
-        AllowListCreatorV1 impl = new AllowListCreatorV1(
+        AllowListNFTCreatorV1 impl = new AllowListNFTCreatorV1(
             address(dropImpl),
             dropMetadataRenderer,
             allowListMetadataRenderer
         );
-        creator = AllowListCreatorV1(
+        creator = AllowListNFTCreatorV1(
             address(new ZoraNFTCreatorProxy(address(impl), ""))
         );
         creator.initialize();
