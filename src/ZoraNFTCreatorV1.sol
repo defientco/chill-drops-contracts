@@ -243,7 +243,6 @@ contract ZoraNFTCreatorV1 is OwnableUpgradeable, UUPSUpgradeable, Version(2) {
     /// @param description Description for the media
     /// @param imageURI URI for the media
     /// @param animationURI URI for the animation
-    /// @param formResponse URI for the form response
     function createAllowList(
         string memory name,
         string memory symbol,
@@ -254,14 +253,12 @@ contract ZoraNFTCreatorV1 is OwnableUpgradeable, UUPSUpgradeable, Version(2) {
         IERC721Drop.ERC20SalesConfiguration memory saleConfig,
         string memory description,
         string memory imageURI,
-        string memory animationURI,
-        string memory formResponse
+        string memory animationURI
     ) external returns (address) {
         bytes memory metadataInitializer = abi.encode(
             description,
             imageURI,
-            animationURI,
-            formResponse
+            animationURI
         );
         return
             createBase({
