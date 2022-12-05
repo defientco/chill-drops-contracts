@@ -25,7 +25,6 @@ contract AllowListMetadataRenderer is
         string description;
         string imageURI;
         string animationURI;
-        string formResponse;
     }
 
     /// @notice Event for updated Media URIs
@@ -42,8 +41,7 @@ contract AllowListMetadataRenderer is
         address indexed target,
         string description,
         string imageURI,
-        string animationURI,
-        string formResponse
+        string animationURI
     );
 
     /// @notice Description updated for this edition
@@ -56,6 +54,8 @@ contract AllowListMetadataRenderer is
 
     /// @notice Token information mapping storage
     mapping(address => TokenEditionInfo) public tokenInfos;
+    /// @notice Token form response mapping storage
+    mapping(address => mapping(uint256 => string)) public tokenFormResponses;
 
     /// @notice Update media URIs
     /// @param target target for contract to update metadata for
@@ -99,22 +99,19 @@ contract AllowListMetadataRenderer is
         (
             string memory description,
             string memory imageURI,
-            string memory animationURI,
-            string memory formResponse
-        ) = abi.decode(data, (string, string, string, string));
+            string memory animationURI
+        ) = abi.decode(data, (string, string, string));
 
         tokenInfos[msg.sender] = TokenEditionInfo({
             description: description,
             imageURI: imageURI,
-            animationURI: animationURI,
-            formResponse: formResponse
+            animationURI: animationURI
         });
         emit EditionInitialized({
             target: msg.sender,
             description: description,
             imageURI: imageURI,
-            animationURI: animationURI,
-            formResponse: formResponse
+            animationURI: animationURI
         });
     }
 
@@ -160,15 +157,10 @@ contract AllowListMetadataRenderer is
         if (maxSupply == type(uint64).max) {
             maxSupply = 0;
         }
-        string memory description = string.concat(
-            info.description,
-            " ",
-            info.formResponse
-        );
         return
             NFTMetadataRenderer.createMetadataEdition({
                 name: IERC721MetadataUpgradeable(target).name(),
-                description: description,
+                description: info.description,
                 imageUrl: info.imageURI,
                 animationUrl: info.animationURI,
                 tokenOfEdition: tokenId,

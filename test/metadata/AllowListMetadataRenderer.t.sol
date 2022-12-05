@@ -65,20 +65,17 @@ contract AllowListMetadataRendererTest is DSTest {
         bytes memory data = abi.encode(
             "Description for metadata",
             "https://example.com/image.png",
-            "https://example.com/animation.mp4",
-            "i love web3"
+            "https://example.com/animation.mp4"
         );
         allowListRenderer.initializeWithData(data);
         (
             string memory description,
             string memory imageURI,
-            string memory animationURI,
-            string memory formResponse
+            string memory animationURI
         ) = allowListRenderer.tokenInfos(address(0x123));
         assertEq(description, "Description for metadata");
         assertEq(animationURI, "https://example.com/animation.mp4");
         assertEq(imageURI, "https://example.com/image.png");
-        assertEq(formResponse, "i love web3");
     }
 
     function test_UpdateDescriptionAllowed() public {
@@ -93,7 +90,7 @@ contract AllowListMetadataRendererTest is DSTest {
 
         allowListRenderer.updateDescription(address(0x123), "new description");
 
-        (string memory updatedDescription, , , ) = allowListRenderer.tokenInfos(
+        (string memory updatedDescription, , ) = allowListRenderer.tokenInfos(
             address(0x123)
         );
         assertEq(updatedDescription, "new description");
@@ -120,8 +117,7 @@ contract AllowListMetadataRendererTest is DSTest {
         bytes memory data = abi.encode(
             "Description for metadata",
             "https://example.com/image.png",
-            "https://example.com/animation.mp4",
-            "i love web3"
+            "https://example.com/animation.mp4"
         );
         allowListRenderer.initializeWithData(data);
 
@@ -134,13 +130,11 @@ contract AllowListMetadataRendererTest is DSTest {
         (
             string memory description,
             string memory imageURI,
-            string memory animationURI,
-            string memory formResponse
+            string memory animationURI
         ) = allowListRenderer.tokenInfos(address(0x123));
         assertEq(description, "Description for metadata");
         assertEq(animationURI, "https://example.com/animation.mp4");
         assertEq(imageURI, "https://example.com/image.png");
-        assertEq(formResponse, "i love web3");
     }
 
     function test_MetadatURIUpdateNotAllowed() public {
