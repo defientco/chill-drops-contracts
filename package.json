@@ -25,10 +25,11 @@
   "devDependencies": {
     "dotenv": "^10.0.0",
     "ejs": "^3.1.7",
+    "es-main": "^1.0.2",
+    "isomorphic-fetch": "^3.0.0",
     "keccak256": "^1.0.6",
     "merkletreejs": "0.2.31",
-    "isomorphic-fetch": "^3.0.0",
-    "es-main": "^1.0.2"
+    "yargs": "^17.6.2"
   },
   "dependencies": {
     "@dotenv/cli": "^2.2.2",
