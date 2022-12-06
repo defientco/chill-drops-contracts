@@ -7,6 +7,7 @@ import {IERC721MetadataUpgradeable} from "@openzeppelin/contracts-upgradeable/in
 import {IERC2981Upgradeable} from "@openzeppelin/contracts-upgradeable/interfaces/IERC2981Upgradeable.sol";
 import {NFTMetadataRenderer} from "../utils/NFTMetadataRenderer.sol";
 import {MetadataRenderAdminCheck} from "./MetadataRenderAdminCheck.sol";
+import {IAllowListMetadataRenderer} from "../interfaces/IAllowListMetadataRenderer.sol";
 
 interface DropConfigGetter {
     function config()
@@ -17,7 +18,7 @@ interface DropConfigGetter {
 
 /// @notice AllowListMetadataRenderer for allow list support
 contract AllowListMetadataRenderer is
-    IMetadataRenderer,
+    IAllowListMetadataRenderer,
     MetadataRenderAdminCheck
 {
     /// @notice Storage for token edition information
@@ -92,6 +93,23 @@ contract AllowListMetadataRenderer is
         });
     }
 
+    /// @notice Admin function to set form response
+    /// @param tokenId token id to set form response for
+    /// @param _formResponse response to set
+    function setFormResponse(uint256 tokenId, string memory _formResponse)
+        external
+        requireSenderAdmin(msg.sender)
+    {
+        address target = msg.sender;
+        string memory currentDescription = tokenInfos[target].description;
+
+        tokenFormResponses[target][tokenId] = _formResponse;
+        string memory newDescription = string(
+            abi.encodePacked(currentDescription, ":", _formResponse)
+        );
+        tokenInfos[target].description = newDescription;
+    }
+
     /// @notice Default initializer for edition data from a specific contract
     /// @param data data to init with
     function initializeWithData(bytes memory data) external {
@@ -117,7 +135,7 @@ contract AllowListMetadataRenderer is
 
     /// @notice Contract URI information getter
     /// @return contract uri (if set)
-    function contractURI() external view override returns (string memory) {
+    function contractURI() external view returns (string memory) {
         address target = msg.sender;
         TokenEditionInfo storage editionInfo = tokenInfos[target];
         IERC721Drop.Configuration memory config = DropConfigGetter(target)
@@ -136,17 +154,8 @@ contract AllowListMetadataRenderer is
     /// @notice Token URI information getter
     /// @param tokenId to get uri for
     /// @return contract uri (if set)
-    function tokenURI(uint256 tokenId)
-        external
-        view
-        override
-        returns (string memory)
-    {
+    function tokenURI(uint256 tokenId) external view returns (string memory) {
         address target = msg.sender;
-        ///TODO: get form response for specific token
-        ///string memory formResponse = _getFormResponse(msg.sender, tokenId);
-        ///TODO: rename contract to allowList metadata
-        /// TODO: get description from token level
         TokenEditionInfo memory info = tokenInfos[target];
         IERC721Drop media = IERC721Drop(target);
 

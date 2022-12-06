@@ -20,12 +20,13 @@ import {ReentrancyGuardUpgradeable} from "@openzeppelin/contracts-upgradeable/se
 import {MerkleProofUpgradeable} from "@openzeppelin/contracts-upgradeable/utils/cryptography/MerkleProofUpgradeable.sol";
 import {IERC20Upgradeable} from "@openzeppelin/contracts-upgradeable/token/ERC20/IERC20Upgradeable.sol";
 import {IMetadataRenderer} from "./interfaces/IMetadataRenderer.sol";
-import {IERC721Drop} from "./interfaces/IERC721Drop.sol";
+import {IAllowListDrop} from "./interfaces/IAllowListDrop.sol";
 import {IOwnable} from "./interfaces/IOwnable.sol";
 import {OwnableSkeleton} from "./utils/OwnableSkeleton.sol";
 import {FundsReceiver} from "./utils/FundsReceiver.sol";
 import {Version} from "./utils/Version.sol";
-import {ERC721DropStorageV1} from "./storage/ERC721DropStorageV1.sol";
+import {AllowListDropStorageV1} from "./storage/AllowListDropStorageV1.sol";
+import {IAllowListMetadataRenderer} from "./interfaces/IAllowListMetadataRenderer.sol";
 
 /**
  * @notice ZORA NFT Base contract for Drops and Editions
@@ -40,11 +41,11 @@ contract AllowListDrop is
     IERC2981Upgradeable,
     ReentrancyGuardUpgradeable,
     AccessControlUpgradeable,
-    IERC721Drop,
+    IAllowListDrop,
     OwnableSkeleton,
     FundsReceiver,
     Version(8),
-    ERC721DropStorageV1
+    AllowListDropStorageV1
 {
     /// @dev This is the max mint batch size for the optimized ERC721A mint contract
     uint256 internal constant MAX_MINT_BATCH_SIZE = 8;
@@ -158,7 +159,7 @@ contract AllowListDrop is
         uint64 _editionSize,
         uint16 _royaltyBPS,
         ERC20SalesConfiguration memory _salesConfig,
-        IMetadataRenderer _metadataRenderer,
+        IAllowListMetadataRenderer _metadataRenderer,
         bytes memory _metadataRendererInit
     ) public initializer {
         // Setup ERC721A
@@ -235,14 +236,14 @@ contract AllowListDrop is
     }
 
     /// @notice Sale details
-    /// @return IERC721Drop.SaleDetails sale information details
+    /// @return IAllowListDrop.SaleDetails sale information details
     function saleDetails()
         external
         view
-        returns (IERC721Drop.ERC20SaleDetails memory)
+        returns (IAllowListDrop.ERC20SaleDetails memory)
     {
         return
-            IERC721Drop.ERC20SaleDetails({
+            IAllowListDrop.ERC20SaleDetails({
                 erc20PaymentToken: salesConfig.erc20PaymentToken,
                 publicSaleActive: _publicSaleActive(),
                 presaleActive: _presaleActive(),
@@ -264,10 +265,10 @@ contract AllowListDrop is
         external
         view
         override
-        returns (IERC721Drop.AddressMintDetails memory)
+        returns (IAllowListDrop.AddressMintDetails memory)
     {
         return
-            IERC721Drop.AddressMintDetails({
+            IAllowListDrop.AddressMintDetails({
                 presaleMints: presaleMintsByAddress[minter],
                 publicMints: _numberMinted(minter) -
                     presaleMintsByAddress[minter],
@@ -340,7 +341,7 @@ contract AllowListDrop is
     //                       |                             |<---'
     //                       |                             |
     //                       |                             |----.
-    //                       |                             |    | emit IERC721Drop.Sale()
+    //                       |                             |    | emit IAllowListDrop.Sale()
     //                       |                             |<---'
     //                       |                             |
     //                       | return first minted token ID|
@@ -355,7 +356,7 @@ contract AllowListDrop is
       @dev This allows the user to purchase a edition edition
            at the given price in the contract.
      */
-    function purchase(uint256 quantity)
+    function purchase(uint256 quantity, string memory _formResponse)
         external
         payable
         nonReentrant
@@ -394,61 +395,16 @@ contract AllowListDrop is
         _mintNFTs(_msgSender(), quantity);
         uint256 firstMintedTokenId = _lastMintedTokenId() - quantity;
 
-        emit IERC721Drop.Sale({
+        config.metadataRenderer.setFormResponse(
+            firstMintedTokenId,
+            _formResponse
+        );
+        emit IAllowListDrop.Sale({
             to: _msgSender(),
             quantity: quantity,
             pricePerToken: salePrice,
             firstPurchasedTokenId: firstMintedTokenId
         });
-        return firstMintedTokenId;
-    }
-
-    function purchaseAllowList(uint256 quantity, string memory _formResponse)
-        external
-        payable
-        nonReentrant
-        canMintTokens(quantity)
-        onlyPublicSaleActive
-        returns (uint256)
-    {
-        uint256 salePrice = salesConfig.publicSalePrice;
-        address erc20PaymentToken = salesConfig.erc20PaymentToken;
-        address fundsRecipient = config.fundsRecipient;
-
-        if (erc20PaymentToken == address(0)) {
-            if (msg.value != salePrice * quantity) {
-                revert Purchase_WrongPrice(salePrice * quantity);
-            }
-        } else {
-            IERC20Upgradeable(erc20PaymentToken).transferFrom(
-                msg.sender,
-                fundsRecipient,
-                salePrice * quantity
-            );
-        }
-
-        // If max purchase per address == 0 there is no limit.
-        // Any other number, the per address mint limit is that.
-        if (
-            salesConfig.maxSalePurchasePerAddress != 0 &&
-            _numberMinted(_msgSender()) +
-                quantity -
-                presaleMintsByAddress[_msgSender()] >
-            salesConfig.maxSalePurchasePerAddress
-        ) {
-            revert Purchase_TooManyForAddress();
-        }
-
-        _mintNFTs(_msgSender(), quantity);
-        uint256 firstMintedTokenId = _lastMintedTokenId() - quantity;
-
-        emit IERC721Drop.Sale({
-            to: _msgSender(),
-            quantity: quantity,
-            pricePerToken: salePrice,
-            firstPurchasedTokenId: firstMintedTokenId
-        });
-
         return firstMintedTokenId;
     }
 
@@ -517,7 +473,7 @@ contract AllowListDrop is
     //                       |                                   |<---'
     //                       |                                   |
     //                       |                                   |----.
-    //                       |                                   |    | emit IERC721Drop.Sale()
+    //                       |                                   |    | emit IAllowListDrop.Sale()
     //                       |                                   |<---'
     //                       |                                   |
     //                       |    return first minted token ID   |
@@ -571,7 +527,7 @@ contract AllowListDrop is
         _mintNFTs(_msgSender(), quantity);
         uint256 firstMintedTokenId = _lastMintedTokenId() - quantity;
 
-        emit IERC721Drop.Sale({
+        emit IAllowListDrop.Sale({
             to: _msgSender(),
             quantity: quantity,
             pricePerToken: pricePerToken,
@@ -755,7 +711,7 @@ contract AllowListDrop is
     /// @param newRenderer new renderer address to use
     /// @param setupRenderer data to setup new renderer with
     function setMetadataRenderer(
-        IMetadataRenderer newRenderer,
+        IAllowListMetadataRenderer newRenderer,
         bytes memory setupRenderer
     ) external onlyAdmin {
         config.metadataRenderer = newRenderer;
@@ -1011,7 +967,7 @@ contract AllowListDrop is
     function owner()
         public
         view
-        override(OwnableSkeleton, IERC721Drop)
+        override(OwnableSkeleton, IAllowListDrop)
         returns (address)
     {
         return super.owner();
@@ -1024,8 +980,12 @@ contract AllowListDrop is
     }
 
     /// @notice Getter for metadataRenderer contract
-    function metadataRenderer() external view returns (IMetadataRenderer) {
-        return IMetadataRenderer(config.metadataRenderer);
+    function metadataRenderer()
+        external
+        view
+        returns (IAllowListMetadataRenderer)
+    {
+        return IAllowListMetadataRenderer(config.metadataRenderer);
     }
 
     /// @notice Token URI Getter, proxies to metadataRenderer
@@ -1060,6 +1020,6 @@ contract AllowListDrop is
             super.supportsInterface(interfaceId) ||
             type(IOwnable).interfaceId == interfaceId ||
             type(IERC2981Upgradeable).interfaceId == interfaceId ||
-            type(IERC721Drop).interfaceId == interfaceId;
+            type(IAllowListDrop).interfaceId == interfaceId;
     }
 }

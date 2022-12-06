@@ -4,9 +4,9 @@ pragma solidity ^0.8.15;
 import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/OwnableUpgradeable.sol";
 import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import {Version} from "./utils/Version.sol";
-import {IERC721Drop} from "./interfaces/IERC721Drop.sol";
+import {IAllowListDrop} from "./interfaces/IAllowListDrop.sol";
 import {DropMetadataRenderer} from "./metadata/DropMetadataRenderer.sol";
-import {IMetadataRenderer} from "./interfaces/IMetadataRenderer.sol";
+import {IAllowListMetadataRenderer} from "./interfaces/IAllowListMetadataRenderer.sol";
 import {AllowListDrop} from "./AllowListDrop.sol";
 import {Clones} from "@openzeppelin/contracts/proxy/Clones.sol";
 import {AllowListMetadataRenderer} from "./metadata/AllowListMetadataRenderer.sol";
@@ -114,8 +114,8 @@ contract AllowListNFTCreatorV1 is
         uint64 editionSize,
         uint16 royaltyBPS,
         address payable fundsRecipient,
-        IERC721Drop.ERC20SalesConfiguration memory saleConfig,
-        IMetadataRenderer metadataRenderer,
+        IAllowListDrop.ERC20SalesConfiguration memory saleConfig,
+        IAllowListMetadataRenderer metadataRenderer,
         bytes memory metadataInitializer
     ) public returns (address newDrop) {
         newDrop = Clones.clone(implementation);
@@ -150,8 +150,8 @@ contract AllowListNFTCreatorV1 is
         uint64 editionSize,
         uint16 royaltyBPS,
         address payable fundsRecipient,
-        IERC721Drop.ERC20SalesConfiguration memory saleConfig,
-        IMetadataRenderer metadataRenderer,
+        IAllowListDrop.ERC20SalesConfiguration memory saleConfig,
+        IAllowListMetadataRenderer metadataRenderer,
         bytes memory metadataInitializer
     ) internal returns (address) {
         return
@@ -164,75 +164,6 @@ contract AllowListNFTCreatorV1 is
                 fundsRecipient: fundsRecipient,
                 saleConfig: saleConfig,
                 metadataRenderer: metadataRenderer,
-                metadataInitializer: metadataInitializer
-            });
-    }
-
-    //        ,-.
-    //        `-'
-    //        /|\
-    //         |                    ,----------------.              ,----------.
-    //        / \                   |ZoraNFTCreatorV1|              |ERC721Drop|
-    //      Caller                  `-------+--------'              `----+-----'
-    //        |                       createDrop()                       |
-    //        | --------------------------------------------------------->
-    //        |                             |                            |
-    //        |                             |----.
-    //        |                             |    | initialize NFT metadata
-    //        |                             |<---'
-    //        |                             |                            |
-    //        |                             |           deploy           |
-    //        |                             | --------------------------->
-    //        |                             |                            |
-    //        |                             |       initialize drop      |
-    //        |                             | --------------------------->
-    //        |                             |                            |
-    //        |                             |----.                       |
-    //        |                             |    | emit CreatedDrop      |
-    //        |                             |<---'                       |
-    //        |                             |                            |
-    //        | return drop contract address|                            |
-    //        | <----------------------------                            |
-    //      Caller                  ,-------+--------.              ,----+-----.
-    //        ,-.                   |ZoraNFTCreatorV1|              |ERC721Drop|
-    //        `-'                   `----------------'              `----------'
-    //        /|\
-    //         |
-    //        / \
-    /// @dev Setup the media contract for a drop
-    /// @param name Name for new contract (cannot be changed)
-    /// @param symbol Symbol for new contract (cannot be changed)
-    /// @param defaultAdmin Default admin address
-    /// @param editionSize The max size of the media contract allowed
-    /// @param royaltyBPS BPS for on-chain royalties (cannot be changed)
-    /// @param fundsRecipient recipient for sale funds and, unless overridden, royalties
-    /// @param metadataURIBase URI Base for metadata
-    /// @param metadataContractURI URI for contract metadata
-    function createDrop(
-        string memory name,
-        string memory symbol,
-        address defaultAdmin,
-        uint64 editionSize,
-        uint16 royaltyBPS,
-        address payable fundsRecipient,
-        IERC721Drop.ERC20SalesConfiguration memory saleConfig,
-        string memory metadataURIBase,
-        string memory metadataContractURI
-    ) external returns (address) {
-        bytes memory metadataInitializer = abi.encode(
-            metadataURIBase,
-            metadataContractURI
-        );
-        return
-            createBase({
-                defaultAdmin: defaultAdmin,
-                name: name,
-                symbol: symbol,
-                royaltyBPS: royaltyBPS,
-                editionSize: editionSize,
-                fundsRecipient: fundsRecipient,
-                saleConfig: saleConfig,
-                metadataRenderer: dropMetadataRenderer,
                 metadataInitializer: metadataInitializer
             });
     }
@@ -254,7 +185,7 @@ contract AllowListNFTCreatorV1 is
         uint64 editionSize,
         uint16 royaltyBPS,
         address payable fundsRecipient,
-        IERC721Drop.ERC20SalesConfiguration memory saleConfig,
+        IAllowListDrop.ERC20SalesConfiguration memory saleConfig,
         string memory description,
         string memory imageURI,
         string memory animationURI
