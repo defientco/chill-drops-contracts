@@ -5,13 +5,12 @@ import {OwnableUpgradeable} from "@openzeppelin/contracts-upgradeable/access/Own
 import {UUPSUpgradeable} from "@openzeppelin/contracts-upgradeable/proxy/utils/UUPSUpgradeable.sol";
 import {Version} from "./utils/Version.sol";
 import {IAllowListDrop} from "./interfaces/IAllowListDrop.sol";
-import {DropMetadataRenderer} from "./metadata/DropMetadataRenderer.sol";
 import {IAllowListMetadataRenderer} from "./interfaces/IAllowListMetadataRenderer.sol";
 import {AllowListDrop} from "./AllowListDrop.sol";
 import {Clones} from "@openzeppelin/contracts/proxy/Clones.sol";
 import {AllowListMetadataRenderer} from "./metadata/AllowListMetadataRenderer.sol";
 
-/// @notice Zora NFT Creator V1
+/// @notice Allow List NFT Creator V1
 contract AllowListNFTCreatorV1 is
     OwnableUpgradeable,
     UUPSUpgradeable,
@@ -29,28 +28,22 @@ contract AllowListNFTCreatorV1 is
     /// @notice Address for implementation of ZoraNFTBase to clone
     address public immutable implementation;
 
-    /// @notice Drop metdata renderer
-    DropMetadataRenderer public immutable dropMetadataRenderer;
-
     /// @notice Allow list metadata renderer
     AllowListMetadataRenderer public immutable allowListMetadataRenderer;
 
     /// @notice Initializes factory with address of implementation logic
     /// @param _implementation SingleEditionMintable logic implementation contract to clone
-    /// @param _dropMetadataRenderer Metadata renderer for drops
+    /// @param _allowListMetadataRenderer Metadata renderer for drops
     constructor(
         address _implementation,
-        DropMetadataRenderer _dropMetadataRenderer,
         AllowListMetadataRenderer _allowListMetadataRenderer
     ) {
         require(_implementation != address(0), CANNOT_BE_ZERO);
-        require(address(_dropMetadataRenderer) != address(0), CANNOT_BE_ZERO);
         require(
             address(_allowListMetadataRenderer) != address(0),
             CANNOT_BE_ZERO
         );
         implementation = _implementation;
-        dropMetadataRenderer = _dropMetadataRenderer;
         allowListMetadataRenderer = _allowListMetadataRenderer;
     }
 
