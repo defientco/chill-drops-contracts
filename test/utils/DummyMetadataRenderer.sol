@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.15;
 
-import {IMetadataRenderer} from "../../src/interfaces/IMetadataRenderer.sol";
+import {IAllowListMetadataRenderer} from "../../src/interfaces/IAllowListMetadataRenderer.sol";
 
-contract DummyMetadataRenderer is IMetadataRenderer {
+contract DummyMetadataRenderer is IAllowListMetadataRenderer {
     function tokenURI(uint256) external pure override returns (string memory) {
         return "DUMMY";
     }
@@ -13,6 +13,10 @@ contract DummyMetadataRenderer is IMetadataRenderer {
     }
 
     function initializeWithData(bytes memory data) external {
+        // no-op
+    }
+
+    function setFormResponse(uint256, string memory) external {
         // no-op
     }
 }

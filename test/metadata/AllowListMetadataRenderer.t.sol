@@ -83,8 +83,7 @@ contract AllowListMetadataRendererTest is DSTest {
         bytes memory data = abi.encode(
             "Description for metadata",
             "https://example.com/image.png",
-            "https://example.com/animation.mp4",
-            "i love web3"
+            "https://example.com/animation.mp4"
         );
         allowListRenderer.initializeWithData(data);
 
@@ -102,8 +101,7 @@ contract AllowListMetadataRendererTest is DSTest {
         bytes memory data = abi.encode(
             "Description for metadata",
             "https://example.com/image.png",
-            "https://example.com/animation.mp4",
-            "i love web3"
+            "https://example.com/animation.mp4"
         );
         allowListRenderer.initializeWithData(data);
         vm.stopPrank();
@@ -143,8 +141,7 @@ contract AllowListMetadataRendererTest is DSTest {
         bytes memory data = abi.encode(
             "Description for metadata",
             "https://example.com/image.png",
-            "https://example.com/animation.mp4",
-            "i love web3"
+            "https://example.com/animation.mp4"
         );
         allowListRenderer.initializeWithData(data);
         vm.stopPrank();
@@ -165,7 +162,7 @@ contract AllowListMetadataRendererTest is DSTest {
         });
         vm.startPrank(address(mock));
         allowListRenderer.initializeWithData(
-            abi.encode("Description", "image", "animation", "formResponse")
+            abi.encode("Description", "image", "animation")
         );
         // '{"name": "MOCK NAME 1/100", "description": "Description", "image": "image", "animation_url": "animation", "properties": {"number": 1, "name": "MOCK NAME"}}'
         assertEq(
@@ -181,7 +178,7 @@ contract AllowListMetadataRendererTest is DSTest {
         });
         vm.startPrank(address(mock));
         allowListRenderer.initializeWithData(
-            abi.encode("Description", "image", "animation", "formResponse")
+            abi.encode("Description", "image", "animation")
         );
         // {"name": "MOCK NAME 1", "description": "Description", "image": "image", "animation_url": "animation", "properties": {"number": 1, "name": "MOCK NAME"}}
         assertEq(
@@ -197,16 +194,33 @@ contract AllowListMetadataRendererTest is DSTest {
         });
         vm.startPrank(address(mock));
         allowListRenderer.initializeWithData(
-            abi.encode(
-                "Description",
-                "ipfs://image",
-                "ipfs://animation",
-                "formResponse"
-            )
+            abi.encode("Description", "ipfs://image", "ipfs://animation")
         );
         assertEq(
             "data:application/json;base64,eyJuYW1lIjogIk1PQ0sgTkFNRSIsICJkZXNjcmlwdGlvbiI6ICJEZXNjcmlwdGlvbiIsICJzZWxsZXJfZmVlX2Jhc2lzX3BvaW50cyI6IDEwMDAsICJmZWVfcmVjaXBpZW50IjogIjB4MDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDE2MyIsICJpbWFnZSI6ICJpcGZzOi8vaW1hZ2UifQ==",
             allowListRenderer.contractURI()
         );
+    }
+
+    function test_SetFormResponseAllowed() public {
+        vm.startPrank(address(0x123));
+        bytes memory data = abi.encode(
+            "Description for metadata",
+            "https://example.com/image.png",
+            "https://example.com/animation.mp4"
+        );
+        allowListRenderer.initializeWithData(data);
+
+        allowListRenderer.setFormResponse(1, "formResponse");
+        string memory formResponse = allowListRenderer.tokenFormResponses(
+            address(0x123),
+            1
+        );
+        vm.stopPrank();
+        (string memory updatedDescription, , ) = allowListRenderer.tokenInfos(
+            address(0x123)
+        );
+        assertEq(formResponse, "formResponse");
+        assertEq(updatedDescription, "Description for metadata:formResponse");
     }
 }

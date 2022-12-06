@@ -5,7 +5,7 @@ import {Vm} from "forge-std/Vm.sol";
 import {DSTest} from "ds-test/test.sol";
 import {IERC721AUpgradeable} from "erc721a-upgradeable/IERC721AUpgradeable.sol";
 
-import {IERC721Drop} from "../src/interfaces/IERC721Drop.sol";
+import {IAllowListDrop} from "../src/interfaces/IAllowListDrop.sol";
 import {AllowListDrop} from "../src/AllowListDrop.sol";
 import {DummyMetadataRenderer} from "./utils/DummyMetadataRenderer.sol";
 import {MockUser} from "./utils/MockUser.sol";
@@ -56,7 +56,7 @@ contract AllowListDropTest is DSTest {
             _royaltyBPS: 800,
             _metadataRenderer: dummyRenderer,
             _metadataRendererInit: "",
-            _salesConfig: IERC721Drop.ERC20SalesConfiguration({
+            _salesConfig: IAllowListDrop.ERC20SalesConfiguration({
                 publicSaleStart: 0,
                 erc20PaymentToken: address(0),
                 publicSaleEnd: 0,
@@ -121,7 +121,7 @@ contract AllowListDropTest is DSTest {
             _royaltyBPS: 800,
             _metadataRenderer: dummyRenderer,
             _metadataRendererInit: "",
-            _salesConfig: IERC721Drop.ERC20SalesConfiguration({
+            _salesConfig: IAllowListDrop.ERC20SalesConfiguration({
                 publicSaleStart: 0,
                 erc20PaymentToken: address(0),
                 publicSaleEnd: 0,
@@ -149,7 +149,7 @@ contract AllowListDropTest is DSTest {
 
         vm.deal(address(456), uint256(amount) * 2);
         vm.prank(address(456));
-        zoraNFTBase.purchase{value: amount}(1);
+        zoraNFTBase.purchase{value: amount}(1, "form response");
 
         assertEq(zoraNFTBase.saleDetails().maxSupply, 10);
         assertEq(zoraNFTBase.saleDetails().totalMinted, 1);
@@ -183,9 +183,9 @@ contract AllowListDropTest is DSTest {
         vm.prank(address(456));
         if (amount > 0) {
             vm.expectRevert("ERC20: insufficient allowance");
-            zoraNFTBase.purchase(1);
+            zoraNFTBase.purchase(1, "form response");
         } else {
-            zoraNFTBase.purchase(1);
+            zoraNFTBase.purchase(1, "form response");
             require(
                 zoraNFTBase.ownerOf(1) == address(456),
                 "owner is wrong for new minted token"
@@ -215,7 +215,7 @@ contract AllowListDropTest is DSTest {
         vm.prank(address(1));
         ct.approve(address(zoraNFTBase), type(uint256).max);
         vm.prank(address(1));
-        zoraNFTBase.purchase(1);
+        zoraNFTBase.purchase(1, "form response");
         require(
             zoraNFTBase.ownerOf(1) == address(1),
             "owner is wrong for new minted token"
@@ -247,8 +247,8 @@ contract AllowListDropTest is DSTest {
 
         vm.deal(address(456), 1 ether);
         vm.prank(address(456));
-        vm.expectRevert(IERC721Drop.Sale_Inactive.selector);
-        zoraNFTBase.purchase{value: 0.1 ether}(1);
+        vm.expectRevert(IAllowListDrop.Sale_Inactive.selector);
+        zoraNFTBase.purchase{value: 0.1 ether}(1, "form response");
 
         assertEq(zoraNFTBase.saleDetails().maxSupply, 10);
         assertEq(zoraNFTBase.saleDetails().totalMinted, 0);
@@ -272,7 +272,7 @@ contract AllowListDropTest is DSTest {
         assertTrue(!zoraNFTBase.saleDetails().presaleActive);
 
         vm.prank(address(456));
-        zoraNFTBase.purchase{value: 0.1 ether}(1);
+        zoraNFTBase.purchase{value: 0.1 ether}(1, "form response");
 
         assertEq(zoraNFTBase.saleDetails().totalMinted, 1);
         assertEq(zoraNFTBase.ownerOf(1), address(456));
@@ -292,8 +292,8 @@ contract AllowListDropTest is DSTest {
     function test_MintWrongValue() public setupZoraNFTBase(10) {
         vm.deal(address(456), 1 ether);
         vm.prank(address(456));
-        vm.expectRevert(IERC721Drop.Sale_Inactive.selector);
-        zoraNFTBase.purchase{value: 0.12 ether}(1);
+        vm.expectRevert(IAllowListDrop.Sale_Inactive.selector);
+        zoraNFTBase.purchase{value: 0.12 ether}(1, "form response");
         vm.prank(DEFAULT_OWNER_ADDRESS);
         zoraNFTBase.setSaleConfiguration({
             erc20PaymentToken: address(0),
@@ -308,11 +308,11 @@ contract AllowListDropTest is DSTest {
         vm.prank(address(456));
         vm.expectRevert(
             abi.encodeWithSelector(
-                IERC721Drop.Purchase_WrongPrice.selector,
+                IAllowListDrop.Purchase_WrongPrice.selector,
                 0.15 ether
             )
         );
-        zoraNFTBase.purchase{value: 0.12 ether}(1);
+        zoraNFTBase.purchase{value: 0.12 ether}(1, "form response");
     }
 
     function test_Withdraw(uint128 amount) public setupZoraNFTBase(10) {
@@ -358,15 +358,19 @@ contract AllowListDropTest is DSTest {
         });
         vm.deal(address(456), 1_000_000 ether);
         vm.prank(address(456));
-        zoraNFTBase.purchase{value: 0.1 ether * uint256(limit)}(limit);
+        zoraNFTBase.purchase{value: 0.1 ether * uint256(limit)}(
+            limit,
+            "form response"
+        );
 
         assertEq(zoraNFTBase.saleDetails().totalMinted, limit);
 
         vm.deal(address(444), 1_000_000 ether);
         vm.prank(address(444));
-        vm.expectRevert(IERC721Drop.Purchase_TooManyForAddress.selector);
+        vm.expectRevert(IAllowListDrop.Purchase_TooManyForAddress.selector);
         zoraNFTBase.purchase{value: 0.1 ether * (uint256(limit) + 1)}(
-            uint256(limit) + 1
+            uint256(limit) + 1,
+            "form response"
         );
 
         assertEq(zoraNFTBase.saleDetails().totalMinted, limit);
@@ -428,12 +432,12 @@ contract AllowListDropTest is DSTest {
         vm.assume(limit > 0);
         vm.startPrank(DEFAULT_OWNER_ADDRESS);
         zoraNFTBase.adminMint(DEFAULT_OWNER_ADDRESS, limit);
-        vm.expectRevert(IERC721Drop.Mint_SoldOut.selector);
+        vm.expectRevert(IAllowListDrop.Mint_SoldOut.selector);
         zoraNFTBase.adminMint(DEFAULT_OWNER_ADDRESS, 1);
     }
 
     function test_WithdrawNotAllowed() public setupZoraNFTBase(10) {
-        vm.expectRevert(IERC721Drop.Access_WithdrawNotAllowed.selector);
+        vm.expectRevert(IAllowListDrop.Access_WithdrawNotAllowed.selector);
         zoraNFTBase.withdraw();
     }
 
@@ -449,12 +453,12 @@ contract AllowListDropTest is DSTest {
             presaleMerkleRoot: bytes32(0),
             maxSalePurchasePerAddress: 5
         });
-        zoraNFTBase.purchase{value: 0.6 ether}(3);
+        zoraNFTBase.purchase{value: 0.6 ether}(3, "form response");
         vm.prank(DEFAULT_OWNER_ADDRESS);
         zoraNFTBase.adminMint(address(0x1234), 2);
         vm.prank(DEFAULT_OWNER_ADDRESS);
         vm.expectRevert(
-            IERC721Drop.Admin_UnableToFinalizeNotOpenEdition.selector
+            IAllowListDrop.Admin_UnableToFinalizeNotOpenEdition.selector
         );
         zoraNFTBase.finalizeOpenEdition();
     }
@@ -474,16 +478,16 @@ contract AllowListDropTest is DSTest {
             presaleMerkleRoot: bytes32(0),
             maxSalePurchasePerAddress: 10
         });
-        zoraNFTBase.purchase{value: 0.6 ether}(3);
+        zoraNFTBase.purchase{value: 0.6 ether}(3, "form response");
         vm.prank(DEFAULT_OWNER_ADDRESS);
         zoraNFTBase.adminMint(address(0x1234), 2);
         vm.prank(DEFAULT_OWNER_ADDRESS);
         zoraNFTBase.finalizeOpenEdition();
-        vm.expectRevert(IERC721Drop.Mint_SoldOut.selector);
+        vm.expectRevert(IAllowListDrop.Mint_SoldOut.selector);
         vm.prank(DEFAULT_OWNER_ADDRESS);
         zoraNFTBase.adminMint(address(0x1234), 2);
-        vm.expectRevert(IERC721Drop.Mint_SoldOut.selector);
-        zoraNFTBase.purchase{value: 0.6 ether}(3);
+        vm.expectRevert(IAllowListDrop.Mint_SoldOut.selector);
+        zoraNFTBase.purchase{value: 0.6 ether}(3, "form response");
     }
 
     function test_AdminMint() public setupZoraNFTBase(10) {
@@ -505,12 +509,12 @@ contract AllowListDropTest is DSTest {
     function test_EditionSizeZero() public setupZoraNFTBase(0) {
         address minter = address(0x32402);
         vm.startPrank(DEFAULT_OWNER_ADDRESS);
-        vm.expectRevert(IERC721Drop.Mint_SoldOut.selector);
+        vm.expectRevert(IAllowListDrop.Mint_SoldOut.selector);
         zoraNFTBase.adminMint(DEFAULT_OWNER_ADDRESS, 1);
         zoraNFTBase.grantRole(zoraNFTBase.MINTER_ROLE(), minter);
         vm.stopPrank();
         vm.prank(minter);
-        vm.expectRevert(IERC721Drop.Mint_SoldOut.selector);
+        vm.expectRevert(IAllowListDrop.Mint_SoldOut.selector);
         zoraNFTBase.adminMint(minter, 1);
 
         vm.prank(DEFAULT_OWNER_ADDRESS);
@@ -527,8 +531,8 @@ contract AllowListDropTest is DSTest {
 
         vm.deal(address(456), uint256(1) * 2);
         vm.prank(address(456));
-        vm.expectRevert(IERC721Drop.Mint_SoldOut.selector);
-        zoraNFTBase.purchase{value: 1}(1);
+        vm.expectRevert(IAllowListDrop.Mint_SoldOut.selector);
+        zoraNFTBase.purchase{value: 1}(1, "form response");
     }
 
     // test Admin airdrop
@@ -625,107 +629,6 @@ contract AllowListDropTest is DSTest {
         require(
             !zoraNFTBase.supportsInterface(0x0000000),
             "doesnt allow non-interface"
-        );
-    }
-
-    function test_Purchase_Allow_List(uint64 amount)
-        public
-        setupZoraNFTBase(10)
-    {
-        vm.prank(DEFAULT_OWNER_ADDRESS);
-        zoraNFTBase.setSaleConfiguration({
-            erc20PaymentToken: address(0),
-            publicSaleStart: 0,
-            publicSaleEnd: type(uint64).max,
-            presaleStart: 0,
-            presaleEnd: 0,
-            publicSalePrice: amount,
-            maxSalePurchasePerAddress: 2,
-            presaleMerkleRoot: bytes32(0)
-        });
-
-        vm.deal(address(456), uint256(amount) * 2);
-        vm.prank(address(456));
-        zoraNFTBase.purchaseAllowList{value: amount}(1, "I love web 3");
-
-        assertEq(zoraNFTBase.saleDetails().maxSupply, 10);
-        assertEq(zoraNFTBase.saleDetails().totalMinted, 1);
-        assertEq(zoraNFTBase.saleDetails().erc20PaymentToken, address(0));
-        require(
-            zoraNFTBase.ownerOf(1) == address(456),
-            "owner is wrong for new minted token"
-        );
-        assertEq(address(zoraNFTBase).balance, amount);
-    }
-
-    function test_PurchaseERC20_AllowList_Revert_InsufficientAllowance(
-        uint64 amount
-    ) public setupZoraNFTBase(10) {
-        assertEq(ct.minter(), address(1));
-        assertEq(ct.balanceOf(address(1)), type(uint64).max);
-        vm.prank(DEFAULT_OWNER_ADDRESS);
-        zoraNFTBase.setSaleConfiguration({
-            erc20PaymentToken: address(ct),
-            publicSaleStart: 0,
-            publicSaleEnd: type(uint64).max,
-            presaleStart: 0,
-            presaleEnd: 0,
-            publicSalePrice: amount,
-            maxSalePurchasePerAddress: 2,
-            presaleMerkleRoot: bytes32(0)
-        });
-
-        vm.deal(address(456), uint256(amount) * 2);
-        vm.prank(address(456));
-        if (amount > 0) {
-            vm.expectRevert("ERC20: insufficient allowance");
-            zoraNFTBase.purchaseAllowList(1, "I Love Web3");
-        } else {
-            zoraNFTBase.purchaseAllowList(1, "I Love Web3");
-            require(
-                zoraNFTBase.ownerOf(1) == address(456),
-                "owner is wrong for new minted token"
-            );
-            assertEq(zoraNFTBase.saleDetails().totalMinted, 1);
-        }
-        assertEq(zoraNFTBase.saleDetails().maxSupply, 10);
-        assertEq(zoraNFTBase.saleDetails().erc20PaymentToken, address(ct));
-    }
-
-    function test_PurchaseERC20_AllowList(uint64 amount)
-        public
-        setupZoraNFTBase(10)
-    {
-        assertEq(ct.minter(), address(1));
-        assertEq(ct.balanceOf(address(1)), type(uint64).max);
-        assertEq(ct.balanceOf(address(DEFAULT_FUNDS_RECIPIENT_ADDRESS)), 0);
-        vm.prank(DEFAULT_OWNER_ADDRESS);
-        zoraNFTBase.setSaleConfiguration({
-            erc20PaymentToken: address(ct),
-            publicSaleStart: 0,
-            publicSaleEnd: type(uint64).max,
-            presaleStart: 0,
-            presaleEnd: 0,
-            publicSalePrice: amount,
-            maxSalePurchasePerAddress: 2,
-            presaleMerkleRoot: bytes32(0)
-        });
-
-        vm.prank(address(1));
-        ct.approve(address(zoraNFTBase), type(uint256).max);
-        vm.prank(address(1));
-        zoraNFTBase.purchaseAllowList(1, "I love web3");
-        require(
-            zoraNFTBase.ownerOf(1) == address(1),
-            "owner is wrong for new minted token"
-        );
-        assertEq(zoraNFTBase.saleDetails().totalMinted, 1);
-        assertEq(zoraNFTBase.saleDetails().maxSupply, 10);
-        assertEq(zoraNFTBase.saleDetails().erc20PaymentToken, address(ct));
-        assertEq(ct.balanceOf(address(1)), type(uint64).max - amount);
-        assertEq(
-            ct.balanceOf(address(DEFAULT_FUNDS_RECIPIENT_ADDRESS)),
-            amount
         );
     }
 }
