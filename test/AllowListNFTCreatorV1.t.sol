@@ -3,11 +3,10 @@ pragma solidity ^0.8.15;
 
 import {DSTest} from "ds-test/test.sol";
 import {Vm} from "forge-std/Vm.sol";
-
+import {console} from "forge-std/console.sol";
 import {IAllowListMetadataRenderer} from "../src/interfaces/IAllowListMetadataRenderer.sol";
 import "../src/AllowListNFTCreatorV1.sol";
 import "../src/ZoraNFTCreatorProxy.sol";
-import {MockMetadataRenderer} from "./metadata/MockMetadataRenderer.sol";
 import {AllowListMetadataRenderer} from "../src/metadata/AllowListMetadataRenderer.sol";
 import {FactoryUpgradeGate} from "../src/FactoryUpgradeGate.sol";
 import {IERC721AUpgradeable} from "erc721a-upgradeable/IERC721AUpgradeable.sol";
@@ -16,9 +15,9 @@ contract ZoraNFTCreatorV1Test is DSTest {
     Vm public constant vm = Vm(HEVM_ADDRESS);
     address public constant DEFAULT_OWNER_ADDRESS = address(0x23499);
     address payable public constant DEFAULT_FUNDS_RECIPIENT_ADDRESS =
-        payable(address(0x21303));
+        payable(address(0xc59b4E5E6311e2e6dAF21A8C16C6A6d56220EC8e));
     address payable public constant DEFAULT_ZORA_DAO_ADDRESS =
-        payable(address(0x999));
+        payable(address(0x909e9efE4D87d1a6018C2065aE642b6D0447bc91));
     AllowListDrop public dropImpl;
     AllowListNFTCreatorV1 public creator;
     AllowListMetadataRenderer public allowListMetadataRenderer;
@@ -63,8 +62,8 @@ contract ZoraNFTCreatorV1Test is DSTest {
 
     function test_CreateAllowListAndMint() public {
         address deployedDrop = creator.createAllowList(
-            "name",
-            "symbol",
+            "creators",
+            "cr8",
             DEFAULT_FUNDS_RECIPIENT_ADDRESS,
             1000,
             100,
@@ -83,7 +82,6 @@ contract ZoraNFTCreatorV1Test is DSTest {
             "https://example.com/image.png",
             "https://example.com/animation.mp4"
         );
-
         IAllowListDrop(deployedDrop).purchase(1, "form response");
         assertEq(IERC721AUpgradeable(deployedDrop).ownerOf(1), address(this));
     }
@@ -122,9 +120,10 @@ contract ZoraNFTCreatorV1Test is DSTest {
         drop.tokenURI(1);
         assertEq(
             drop.contractURI(),
-            "data:application/json;base64,eyJuYW1lIjogIm5hbWUiLCAiZGVzY3JpcHRpb24iOiAiRGVzY3JpcHRpb24gZm9yIG1ldGFkYXRhIiwgInNlbGxlcl9mZWVfYmFzaXNfcG9pbnRzIjogMTAwLCAiZmVlX3JlY2lwaWVudCI6ICIweDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMjEzMDMiLCAiaW1hZ2UiOiAiaHR0cHM6Ly9leGFtcGxlLmNvbS9pbWFnZS5wbmcifQ=="
+            "data:application/json;base64,eyJuYW1lIjogIm5hbWUiLCAiZGVzY3JpcHRpb24iOiAiRGVzY3JpcHRpb24gZm9yIG1ldGFkYXRhIiwgInNlbGxlcl9mZWVfYmFzaXNfcG9pbnRzIjogMTAwLCAiZmVlX3JlY2lwaWVudCI6ICIweGM1OWI0ZTVlNjMxMWUyZTZkYWYyMWE4YzE2YzZhNmQ1NjIyMGVjOGUiLCAiaW1hZ2UiOiAiaHR0cHM6Ly9leGFtcGxlLmNvbS9pbWFnZS5wbmcifQ=="
         );
         drop.purchase(1, "form response");
+        assertEq(drop.getFormResponse(1), "form response");
         assertEq(
             drop.tokenURI(1),
             "data:application/json;base64,eyJuYW1lIjogIm5hbWUgMS8xMDAwIiwgImRlc2NyaXB0aW9uIjogIkRlc2NyaXB0aW9uIGZvciBtZXRhZGF0YTpmb3JtIHJlc3BvbnNlIiwgImltYWdlIjogImh0dHBzOi8vZXhhbXBsZS5jb20vaW1hZ2UucG5nIiwgImFuaW1hdGlvbl91cmwiOiAiaHR0cHM6Ly9leGFtcGxlLmNvbS9hbmltYXRpb24ubXA0IiwgInByb3BlcnRpZXMiOiB7Im51bWJlciI6IDEsICJuYW1lIjogIm5hbWUifX0="
