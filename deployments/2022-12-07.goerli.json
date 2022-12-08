@@ -1,0 +1,58 @@
+{
+  "allowListDropContract": {
+    "deployed": {
+      "deploy": {
+        "deployer": "0x45a3143dC8e28A6d73ad6c6Fd78d80a4CAA17524",
+        "deployedTo": "0x405977EEdDED2F05fDCBf47A56e2844b933A67A7",
+        "transactionHash": "0x4a1cdd219274c54713231308cac3696a7198d3d28c69b3bb51d01b1d078d13ab"
+      },
+      "contractName": "AllowListDrop",
+      "contractPath": "src/AllowListDrop.sol",
+      "args": [
+        "0x909e9efE4D87d1a6018C2065aE642b6D0447bc91"
+      ]
+    },
+    "verify": {
+      "verify": "Start verifying contract `0x405977eedded2f05fdcbf47a56e2844b933a67a7` deployed on mumbai\n\nSubmitting verification for [src/AllowListDrop.sol:AllowListDrop] \"0x405977EEdDED2F05fDCBf47A56e2844b933A67A7\".\n\nSubmitting verification for [src/AllowListDrop.sol:AllowListDrop] \"0x405977EEdDED2F05fDCBf47A56e2844b933A67A7\".\n\nSubmitting verification for [src/AllowListDrop.sol:AllowListDrop] \"0x405977EEdDED2F05fDCBf47A56e2844b933A67A7\".\nSubmitted contract for verification:\n\tResponse: `OK`\n\tGUID: `beukrxveeibnetyp1eayr1mbwjmz9yqwnqwyasgurnrgnr6h6q`\n\tURL:\n        https://mumbai.polygonscan.com/address/0x405977eedded2f05fdcbf47a56e2844b933a67a7\n",
+      "contractName": "AllowListDrop",
+      "contractPath": "src/AllowListDrop.sol"
+    }
+  },
+  "allowListMetadataContract": {
+    "deployed": {
+      "deploy": {
+        "deployer": "0x45a3143dC8e28A6d73ad6c6Fd78d80a4CAA17524",
+        "deployedTo": "0x82e7286EA09B966ce4966ea9de717234Ba4b7E5E",
+        "transactionHash": "0x1c9735c65640738cda0582e2c4e6e87fb35dde07c37db25f51e95ed86e7c4c8d"
+      },
+      "contractName": "AllowListMetadataRenderer",
+      "contractPath": "src/metadata/AllowListMetadataRenderer.sol",
+      "args": []
+    },
+    "verify": {
+      "verify": "Start verifying contract `0x82e7286ea09b966ce4966ea9de717234ba4b7e5e` deployed on mumbai\n\nSubmitting verification for [src/metadata/AllowListMetadataRenderer.sol:AllowListMetadataRenderer] \"0x82e7286EA09B966ce4966ea9de717234Ba4b7E5E\".\n\nSubmitting verification for [src/metadata/AllowListMetadataRenderer.sol:AllowListMetadataRenderer] \"0x82e7286EA09B966ce4966ea9de717234Ba4b7E5E\".\n\nSubmitting verification for [src/metadata/AllowListMetadataRenderer.sol:AllowListMetadataRenderer] \"0x82e7286EA09B966ce4966ea9de717234Ba4b7E5E\".\nSubmitted contract for verification:\n\tResponse: `OK`\n\tGUID: `8gt63bhig7kn5ft6zqv1fzz7hc95m5e6tira3immfgbzjwjcpi`\n\tURL:\n        https://mumbai.polygonscan.com/address/0x82e7286ea09b966ce4966ea9de717234ba4b7e5e\n",
+      "contractName": "AllowListMetadataRenderer",
+      "contractPath": "src/metadata/AllowListMetadataRenderer.sol"
+    }
+  },
+  "creatorImpl": {
+    "deployed": {
+      "deploy": {
+        "deployer": "0x45a3143dC8e28A6d73ad6c6Fd78d80a4CAA17524",
+        "deployedTo": "0x8E3cd4a58BdD82A9f064EBB05818c72FC86B421c",
+        "transactionHash": "0x1347e0a139952714fa26c0cdb351134ff3bd49dabc15db1a5e31810548709650"
+      },
+      "contractName": "AllowListNFTCreatorV1",
+      "contractPath": "src/AllowListNFTCreatorV1.sol",
+      "args": [
+        "0x405977EEdDED2F05fDCBf47A56e2844b933A67A7",
+        "0x82e7286EA09B966ce4966ea9de717234Ba4b7E5E"
+      ]
+    },
+    "verify": {
+      "verify": "Start verifying contract `0x8e3cd4a58bdd82a9f064ebb05818c72fc86b421c` deployed on mumbai\n\nSubmitting verification for [src/AllowListNFTCreatorV1.sol:AllowListNFTCreatorV1] \"0x8E3cd4a58BdD82A9f064EBB05818c72FC86B421c\".\n\nSubmitting verification for [src/AllowListNFTCreatorV1.sol:AllowListNFTCreatorV1] \"0x8E3cd4a58BdD82A9f064EBB05818c72FC86B421c\".\n\nSubmitting verification for [src/AllowListNFTCreatorV1.sol:AllowListNFTCreatorV1] \"0x8E3cd4a58BdD82A9f064EBB05818c72FC86B421c\".\nSubmitted contract for verification:\n\tResponse: `OK`\n\tGUID: `rhb6bzhmqsscvbueumpj4hcakynznctxh5ewumihsgjmu3k165`\n\tURL:\n        https://mumbai.polygonscan.com/address/0x8e3cd4a58bdd82a9f064ebb05818c72fc86b421c\n",
+      "contractName": "AllowListNFTCreatorV1",
+      "contractPath": "src/AllowListNFTCreatorV1.sol"
+    }
+  }
+}
