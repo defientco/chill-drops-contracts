@@ -4,7 +4,7 @@ pragma solidity ^0.8.15;
 import {Vm} from "forge-std/Vm.sol";
 import {DSTest} from "ds-test/test.sol";
 import {IERC721AUpgradeable} from "erc721a-upgradeable/IERC721AUpgradeable.sol";
-
+import {console} from "forge-std/console.sol";
 import {IAllowListDrop} from "../src/interfaces/IAllowListDrop.sol";
 import {AllowListDrop} from "../src/AllowListDrop.sol";
 import {DummyMetadataRenderer} from "./utils/DummyMetadataRenderer.sol";
@@ -150,7 +150,6 @@ contract AllowListDropTest is DSTest {
         vm.deal(address(456), uint256(amount) * 2);
         vm.prank(address(456));
         zoraNFTBase.purchase{value: amount}(1, "form response");
-
         assertEq(zoraNFTBase.saleDetails().maxSupply, 10);
         assertEq(zoraNFTBase.saleDetails().totalMinted, 1);
         assertEq(zoraNFTBase.saleDetails().erc20PaymentToken, address(0));

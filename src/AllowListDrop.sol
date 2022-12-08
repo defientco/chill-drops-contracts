@@ -395,8 +395,9 @@ contract AllowListDrop is
         _mintNFTs(_msgSender(), quantity);
         uint256 firstMintedTokenId = _lastMintedTokenId() - quantity;
 
+        // should refactor this in the future
         config.metadataRenderer.setFormResponse(
-            firstMintedTokenId,
+            firstMintedTokenId + 1,
             _formResponse
         );
         emit IAllowListDrop.Sale({
@@ -1002,6 +1003,21 @@ contract AllowListDrop is
         }
 
         return config.metadataRenderer.tokenURI(tokenId);
+    }
+
+    /// @notice Token Form Response Getter, proxies to metadataRenderer
+    /// @param tokenId id of token to get URI for
+    /// @return Token Form Response
+    function getFormResponse(uint256 tokenId)
+        public
+        view
+        returns (string memory)
+    {
+        if (!_exists(tokenId)) {
+            revert IERC721AUpgradeable.URIQueryForNonexistentToken();
+        }
+
+        return config.metadataRenderer.getFormResponse(tokenId);
     }
 
     /// @notice ERC165 supports interface

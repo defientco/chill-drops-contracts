@@ -1,8 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.15;
 
-import {IMetadataRenderer} from "../interfaces/IMetadataRenderer.sol";
-import {IERC721Drop} from "../interfaces/IERC721Drop.sol";
+import {IAllowListDrop} from "../interfaces/IAllowListDrop.sol";
 import {IERC721MetadataUpgradeable} from "@openzeppelin/contracts-upgradeable/interfaces/IERC721MetadataUpgradeable.sol";
 import {IERC2981Upgradeable} from "@openzeppelin/contracts-upgradeable/interfaces/IERC2981Upgradeable.sol";
 import {NFTMetadataRenderer} from "../utils/NFTMetadataRenderer.sol";
@@ -13,7 +12,7 @@ interface DropConfigGetter {
     function config()
         external
         view
-        returns (IERC721Drop.Configuration memory config);
+        returns (IAllowListDrop.Configuration memory config);
 }
 
 /// @notice AllowListMetadataRenderer for allow list support
@@ -101,13 +100,18 @@ contract AllowListMetadataRenderer is
         requireSenderAdmin(msg.sender)
     {
         address target = msg.sender;
-        string memory currentDescription = tokenInfos[target].description;
-
         tokenFormResponses[target][tokenId] = _formResponse;
-        string memory newDescription = string(
-            abi.encodePacked(currentDescription, ":", _formResponse)
-        );
-        tokenInfos[target].description = newDescription;
+    }
+
+    /// @notice Admin function to get form response
+    /// @param tokenId token id to set form response for
+    function getFormResponse(uint256 tokenId)
+        external
+        view
+        returns (string memory)
+    {
+        address target = msg.sender;
+        return tokenFormResponses[target][tokenId];
     }
 
     /// @notice Default initializer for edition data from a specific contract
@@ -135,10 +139,10 @@ contract AllowListMetadataRenderer is
 
     /// @notice Contract URI information getter
     /// @return contract uri (if set)
-    function contractURI() external view returns (string memory) {
+    function contractURI() external view override returns (string memory) {
         address target = msg.sender;
         TokenEditionInfo storage editionInfo = tokenInfos[target];
-        IERC721Drop.Configuration memory config = DropConfigGetter(target)
+        IAllowListDrop.Configuration memory config = DropConfigGetter(target)
             .config();
 
         return
@@ -154,10 +158,15 @@ contract AllowListMetadataRenderer is
     /// @notice Token URI information getter
     /// @param tokenId to get uri for
     /// @return contract uri (if set)
-    function tokenURI(uint256 tokenId) external view returns (string memory) {
+    function tokenURI(uint256 tokenId)
+        external
+        view
+        override
+        returns (string memory)
+    {
         address target = msg.sender;
         TokenEditionInfo memory info = tokenInfos[target];
-        IERC721Drop media = IERC721Drop(target);
+        IAllowListDrop media = IAllowListDrop(target);
 
         uint256 maxSupply = media.saleDetails().maxSupply;
 
@@ -166,10 +175,14 @@ contract AllowListMetadataRenderer is
         if (maxSupply == type(uint64).max) {
             maxSupply = 0;
         }
+        string memory formResponse = tokenFormResponses[target][tokenId];
+        string memory _newDescirption = string(
+            abi.encodePacked(info.description, ":", formResponse)
+        );
         return
             NFTMetadataRenderer.createMetadataEdition({
                 name: IERC721MetadataUpgradeable(target).name(),
-                description: info.description,
+                description: _newDescirption,
                 imageUrl: info.imageURI,
                 animationUrl: info.animationURI,
                 tokenOfEdition: tokenId,

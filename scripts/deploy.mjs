@@ -81,7 +81,6 @@ export async function setupContracts() {
 }
 
 async function main() {
-  console.log(argv);
   const output = argv.a ? await setupAllowListContracts() : await setupContracts();
   const date = new Date().toISOString().slice(0, 10);
   writeFile(`./deployments/${date}.${process.env.CHAIN}.json`, JSON.stringify(output, null, 2));
