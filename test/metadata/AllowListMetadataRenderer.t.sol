@@ -3,18 +3,18 @@ pragma solidity ^0.8.10;
 
 import {AllowListMetadataRenderer} from "../../src/metadata/AllowListMetadataRenderer.sol";
 import {MetadataRenderAdminCheck} from "../../src/metadata/MetadataRenderAdminCheck.sol";
-import {IMetadataRenderer} from "../../src/interfaces/IMetadataRenderer.sol";
+import {IAllowListMetadataRenderer} from "../../src/interfaces/IAllowListMetadataRenderer.sol";
 import {DropMockBase} from "./DropMockBase.sol";
-import {IERC721Drop} from "../../src/interfaces/IERC721Drop.sol";
+import {IAllowListDrop} from "../../src/interfaces/IAllowListDrop.sol";
 import {DSTest} from "ds-test/test.sol";
 import {Vm} from "forge-std/Vm.sol";
 
 contract IERC721OnChainDataMock {
-    IERC721Drop.ERC20SaleDetails private saleDetailsInternal;
-    IERC721Drop.Configuration private configInternal;
+    IAllowListDrop.ERC20SaleDetails private saleDetailsInternal;
+    IAllowListDrop.Configuration private configInternal;
 
     constructor(uint256 totalMinted, uint256 maxSupply) {
-        saleDetailsInternal = IERC721Drop.ERC20SaleDetails({
+        saleDetailsInternal = IAllowListDrop.ERC20SaleDetails({
             erc20PaymentToken: address(0),
             publicSaleActive: false,
             presaleActive: false,
@@ -29,8 +29,8 @@ contract IERC721OnChainDataMock {
             maxSupply: maxSupply
         });
 
-        configInternal = IERC721Drop.Configuration({
-            metadataRenderer: IMetadataRenderer(address(0x0)),
+        configInternal = IAllowListDrop.Configuration({
+            metadataRenderer: IAllowListMetadataRenderer(address(0x0)),
             editionSize: 12,
             royaltyBPS: 1000,
             fundsRecipient: payable(address(0x163))
@@ -44,12 +44,16 @@ contract IERC721OnChainDataMock {
     function saleDetails()
         external
         view
-        returns (IERC721Drop.ERC20SaleDetails memory)
+        returns (IAllowListDrop.ERC20SaleDetails memory)
     {
         return saleDetailsInternal;
     }
 
-    function config() external view returns (IERC721Drop.Configuration memory) {
+    function config()
+        external
+        view
+        returns (IAllowListDrop.Configuration memory)
+    {
         return configInternal;
     }
 }
@@ -166,7 +170,7 @@ contract AllowListMetadataRendererTest is DSTest {
         );
         // '{"name": "MOCK NAME 1/100", "description": "Description", "image": "image", "animation_url": "animation", "properties": {"number": 1, "name": "MOCK NAME"}}'
         assertEq(
-            "data:application/json;base64,eyJuYW1lIjogIk1PQ0sgTkFNRSAxLzEwMCIsICJkZXNjcmlwdGlvbiI6ICJEZXNjcmlwdGlvbiIsICJpbWFnZSI6ICJpbWFnZSIsICJhbmltYXRpb25fdXJsIjogImFuaW1hdGlvbiIsICJwcm9wZXJ0aWVzIjogeyJudW1iZXIiOiAxLCAibmFtZSI6ICJNT0NLIE5BTUUifX0=",
+            "data:application/json;base64,eyJuYW1lIjogIk1PQ0sgTkFNRSAxLzEwMCIsICJkZXNjcmlwdGlvbiI6ICJEZXNjcmlwdGlvbjoiLCAiaW1hZ2UiOiAiaW1hZ2UiLCAiYW5pbWF0aW9uX3VybCI6ICJhbmltYXRpb24iLCAicHJvcGVydGllcyI6IHsibnVtYmVyIjogMSwgIm5hbWUiOiAiTU9DSyBOQU1FIn19",
             allowListRenderer.tokenURI(1)
         );
     }
@@ -182,7 +186,7 @@ contract AllowListMetadataRendererTest is DSTest {
         );
         // {"name": "MOCK NAME 1", "description": "Description", "image": "image", "animation_url": "animation", "properties": {"number": 1, "name": "MOCK NAME"}}
         assertEq(
-            "data:application/json;base64,eyJuYW1lIjogIk1PQ0sgTkFNRSAxIiwgImRlc2NyaXB0aW9uIjogIkRlc2NyaXB0aW9uIiwgImltYWdlIjogImltYWdlIiwgImFuaW1hdGlvbl91cmwiOiAiYW5pbWF0aW9uIiwgInByb3BlcnRpZXMiOiB7Im51bWJlciI6IDEsICJuYW1lIjogIk1PQ0sgTkFNRSJ9fQ==",
+            "data:application/json;base64,eyJuYW1lIjogIk1PQ0sgTkFNRSAxIiwgImRlc2NyaXB0aW9uIjogIkRlc2NyaXB0aW9uOiIsICJpbWFnZSI6ICJpbWFnZSIsICJhbmltYXRpb25fdXJsIjogImFuaW1hdGlvbiIsICJwcm9wZXJ0aWVzIjogeyJudW1iZXIiOiAxLCAibmFtZSI6ICJNT0NLIE5BTUUifX0=",
             allowListRenderer.tokenURI(1)
         );
     }
@@ -212,15 +216,8 @@ contract AllowListMetadataRendererTest is DSTest {
         allowListRenderer.initializeWithData(data);
 
         allowListRenderer.setFormResponse(1, "formResponse");
-        string memory formResponse = allowListRenderer.tokenFormResponses(
-            address(0x123),
-            1
-        );
+        string memory formResponse = allowListRenderer.getFormResponse(1);
         vm.stopPrank();
-        (string memory updatedDescription, , ) = allowListRenderer.tokenInfos(
-            address(0x123)
-        );
         assertEq(formResponse, "formResponse");
-        assertEq(updatedDescription, "Description for metadata:formResponse");
     }
 }
